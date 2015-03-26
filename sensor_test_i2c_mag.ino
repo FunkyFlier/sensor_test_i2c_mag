@@ -3,9 +3,23 @@
 #include <Streaming.h>
 #include "UBLOXL.h"
 
-#define RED 38
-#define YELLOW 40
+//#define V1
+#define V2
+
+#ifdef V2
+#ifdef V1
+#undef V1
+#endif
+#endif
+
+//common defines
+
+//#define ROT_45
+//LED defines GREEN, YELLOW, BLUE, RED
 #define GREEN 42
+#define YELLOW 40
+#define BLUE 13
+#define RED 38
 
 //general SPI defines
 #define READ 0x80
@@ -21,43 +35,10 @@
 #define L3G_CTRL_REG5 0x24
 #define L3G_OUT_X_L 0x28
 #define L3G_WHO_AM_I 0x0F
-//acc defines
-#define CTRL_REG1_A 0x20
-#define CTRL_REG2_A 0x21
-#define CTRL_REG3_A 0x22
-#define CTRL_REG4_A 0x23
-#define CTRL_REG5_A 0x24
-#define CTRL_REG6_A 0x25
-#define OUT_X_L_A 0x28
-
-//mag defines ST LSM303DLHC - will work with the HMC5883L
-#define MAG_ADDRESS 0x1E
-#define LSM303_CRA_REG (uint8_t)0x00 
-#define LSM303_CRB_REG 0x01
-#define LSM303_MR_REG 0x02
-#define LSM303_OUT_X_H 0x03
-
-
-//baro defines
-#define MS5611_RESET 0x1E
-#define MS5611_PROM_Setup 0xA0
-#define MS5611_PROM_C1 0xA2
-#define MS5611_PROM_C2 0xA4
-#define MS5611_PROM_C3 0xA6
-#define MS5611_PROM_C4 0xA8
-#define MS5611_PROM_C5 0xAA
-#define MS5611_PROM_C6 0xAC
-#define MS5611_PROM_CRC 0xAE
-#define CONVERT_D1_OSR4096 0x48   // Maximun resolution
-#define CONVERT_D2_OSR4096 0x58   // Maximun resolution
-
-#define ADC_READ 0x00
-
-#define BARO_CONV_TIME 50
 
 //mag defines ST HMC5983DLHC - will work with the HMC5883L
 #define MAG_ADDRESS 0x1E
-#define HMC5983_CRA_REG (uint8_t)0x00 //??? Wire.h needs to be fixed
+#define HMC5983_CRA_REG (uint8_t)0x00 
 #define HMC5983_CRB_REG 0x01
 #define HMC5983_MR_REG 0x02
 #define HMC5983_OUT_X_H 0x03
@@ -65,6 +46,7 @@
 #define HMC5983_ID_A 0x0A
 #define HMC5983_ID_B 0x0B
 #define HMC5983_ID_C 0x0C
+
 
 //however digitalWrite will work when using SPI 
 #define GyroSSOutput() DDRL |= 1<<0 
@@ -87,6 +69,7 @@
 #define FlashSSHigh() PORTL |= 1<<4
 #define FlashSSLow() PORTL &= ~(1<<4)
 
+
 #define FREQ_TRIG 20
 #define PRESCALE_TRIG 64
 #define PERIOD_TRIG ((F_CPU/PRESCALE_TRIG/FREQ_TRIG) - 1)
@@ -96,7 +79,80 @@
 #define Port2 Serial2
 #define gpsPort Serial3
 
-UBLOX gps;
+
+//end common defines
+
+//V1 defines
+#ifdef V1
+//acc defines - Analog Devices ADXL345
+#define BW_RATE 0x2C
+#define POWER_CTL 0x2D
+#define DATA_FORMAT 0x31
+#define DATAX0 0x32
+
+//barometer defines
+#define BMP085_ADDRESS 0x77
+#define POLL_RATE 20
+/*#define OSS 0x00
+ #define CONV_TIME 5*/
+/*#define OSS 0x01
+ #define CONV_TIME 8*/
+/*#define OSS 0x02
+ #define CONV_TIME 14*/
+#define OSS 0x03
+#define CONV_TIME 27
+
+#define Motor1WriteMicros(x) OCR3B = x * 2
+#define Motor2WriteMicros(x) OCR3C = x * 2
+#define Motor3WriteMicros(x) OCR3A = x * 2
+#define Motor4WriteMicros(x) OCR4A = x * 2
+#define Motor5WriteMicros(x) OCR4B = x * 2
+#define Motor6WriteMicros(x) OCR4C = x * 2
+#define Motor7WriteMicros(x) OCR1A = x * 2
+#define Motor8WriteMicros(x) OCR1B = x * 2
+#endif//#ifdef V1
+//end V1 defines
+
+//V2 defines
+#ifdef V2
+//acc defines
+#define CTRL_REG1_A 0x20
+#define CTRL_REG2_A 0x21
+#define CTRL_REG3_A 0x22
+#define CTRL_REG4_A 0x23
+#define CTRL_REG5_A 0x24
+#define CTRL_REG6_A 0x25
+#define OUT_X_L_A 0x28
+
+//baro defines
+#define MS5611_RESET 0x1E
+#define MS5611_PROM_Setup 0xA0
+#define MS5611_PROM_C1 0xA2
+#define MS5611_PROM_C2 0xA4
+#define MS5611_PROM_C3 0xA6
+#define MS5611_PROM_C4 0xA8
+#define MS5611_PROM_C5 0xAA
+#define MS5611_PROM_C6 0xAC
+#define MS5611_PROM_CRC 0xAE
+#define CONVERT_D1_OSR4096 0x48   // Maximun resolution
+#define CONVERT_D2_OSR4096 0x58   // Maximun resolution
+
+#define ADC_READ 0x00
+
+#define BARO_CONV_TIME 50
+
+
+#define Motor1WriteMicros(x) OCR3A = x * 2//motor 1 is attached to pin2
+#define Motor2WriteMicros(x) OCR3B = x * 2//motor 2 is attached to pin3
+#define Motor3WriteMicros(x) OCR3C = x * 2//motor 3 is attached to pin5
+#define Motor4WriteMicros(x) OCR4A = x * 2//motor 4 is attached to pin6
+#define Motor5WriteMicros(x) OCR4B = x * 2//motor 1 is attached to pin7
+#define Motor6WriteMicros(x) OCR4C = x * 2//motor 2 is attached to pin8
+//#define Motor7WriteMicros(x) OCR1A = x * 2//motor 3 is attached to pin11
+//#define Motor8WriteMicros(x) OCR1B = x * 2//motor 4 is attached to pin12
+#endif//#ifdef V2
+//end V2 defines
+
 
 typedef union{
   float val;
@@ -128,25 +184,94 @@ typedef union{
 }
 uint16_u;
 
+
+//common vars
+UBLOX gps;
 int16_u gyroX,gyroY,gyroZ,accX,accY,accZ,magX,magY,magZ;
-
-uint16_u C1,C2,C3,C4,C5,C6,promSetup,promCRC;
-uint32_u D_rcvd;
-float D1,D2;
-float pressure,initialPressure,alti,temperature,dT,TEMP,OFF,SENS,P;
-uint8_t baroState;
-uint32_t baroRateTimer,baroDelayTimer;
-boolean newBaro;
-
-uint32_t pollTimer,printTimer;
-int16_t tempX,tempY;
-
 uint8_t idA,idB,idC;
+uint32_t printTimer;
 
 float_u gpsAlt;
 
 float_u floatLat, floatLon;
 float_u velN,velE,velD;
+float initialPressure,alti;
+//end common vars
+#ifdef V1
+//v1 vars
+//barometer variables
+int32_u pressure;
+short temperature;
+uint32_t baroTimer;
+int pressureState;
+int ac1;
+int ac2;
+int ac3;
+unsigned int ac4;
+unsigned int ac5;
+unsigned int ac6;
+int b1;
+int b2;
+int mb;
+int mc;
+int md;
+unsigned char msb;
+unsigned char lsb;
+unsigned char xlsb;
+long x1;
+long x2;
+long x3;
+long b3;
+long b5;
+long b6;
+long p;
+unsigned long b4;
+unsigned long b7;
+unsigned int ut;
+unsigned long up;
+uint32_t baroPollTimer;
+boolean newBaro = false;
+float pressureRatio;
+int baroCount;
+float baroSum;
+long pressureInitial; 
+#endif//#ifdef V1
+//end v1 vars
+
+
+//v2 vars
+#ifdef V2
+//barometer
+uint16_u C1,C2,C3,C4,C5,C6,promSetup,promCRC;
+uint32_u D_rcvd;
+float D1,D2;
+float pressure,temperature,dT,TEMP,OFF,SENS,P;
+uint8_t baroState;
+uint32_t baroRateTimer,baroDelayTimer;
+boolean newBaro;
+
+uint32_t pollTimer;
+#endif//#ifdef V2
+//end barometer
+
+//end v2 vars
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -182,7 +307,9 @@ void setup(){
   digitalWrite(YELLOW,LOW);
   pinMode(13,OUTPUT);
   digitalWrite(13,LOW);
-
+  digitalWrite(GREEN,HIGH);
+  while(1){
+  }
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(SPI_CLOCK_DIV2);   
@@ -222,10 +349,10 @@ void loop(){
     //Serial<<magX.val<<","<<magY.val<<","<<magZ.val<<"\r\n";
     //Serial<<_HEX(idA)<<","<<_HEX(idB)<<","<<_HEX(idC)<<"\r\n";
 
-    /*Serial<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val
-      <<","<<accX.val<<","<<accY.val<<","<<accZ.val
-      <<","<<magX.val<<","<<magY.val<<","<<magZ.val
-      <<","<<temperature<<","<<pressure<<","<<alti<<","<<initialPressure<<"\r\n";*/
+    Serial<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val
+     <<","<<accX.val<<","<<accY.val<<","<<accZ.val
+     <<","<<magX.val<<","<<magY.val<<","<<magZ.val
+     <<","<<temperature<<","<<pressure<<","<<alti<<","<<initialPressure<<"\r\n";
     //Serial<<accX.val<<","<<accY.val<<","<<accZ.val<<"\r\n";
     //Serial<<accX.val<<"   "<<accY.val<<"   "<<accZ.val<<"\r\n";
     //Serial<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val<<"\r\n";
@@ -243,7 +370,7 @@ void loop(){
     velD.val = gps.data.vars.velD * 0.01;
 
     Serial<<floatLat.val<<","<<floatLon.val<<","<<gpsAlt.val<<","<<velN.val<<","<<velE.val<<","<<velD.val<<","
-          <<gps.data.vars.gpsFix<<","<< gps.data.vars.numSV<<","<<gps.data.vars.hAcc<<","<<gps.data.vars.sAcc<<","<<gps.data.vars.pDop<<"\r\n";
+      <<gps.data.vars.gpsFix<<","<< gps.data.vars.numSV<<","<<gps.data.vars.hAcc<<","<<gps.data.vars.sAcc<<","<<gps.data.vars.pDop<<"\r\n";
 
   }
 
@@ -282,7 +409,7 @@ void GetMag(){
    magY.buffer[0] = SPI.transfer(0x00);
    MagSSHigh();*/
 
-  I2c.read(MAG_ADDRESS,LSM303_OUT_X_H,6);
+  I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
   magX.buffer[1] = I2c.receive();//X
   magX.buffer[0] = I2c.receive();
   magZ.buffer[1] = I2c.receive();//Z
@@ -305,9 +432,9 @@ void MagInit(){
    SPI.transfer(HMC5983_MR_REG | WRITE | SINGLE);
    SPI.transfer(0x00);
    MagSSHigh();*/
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)LSM303_CRA_REG,(uint8_t)0x18);
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)LSM303_CRB_REG,(uint8_t)0x60);
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)LSM303_MR_REG,(uint8_t)0x00);
+  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRA_REG,(uint8_t)0x18);
+  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRB_REG,(uint8_t)0x60);
+  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_MR_REG,(uint8_t)0x00);
 
   I2c.read((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_ID_A,(uint8_t)3);
 
@@ -326,7 +453,7 @@ void MagInit(){
   }
   //Serial<<_HEX(idA)<<","<<_HEX(idB)<<","<<_HEX(idC)<<"\r\n";
 
-  I2c.read(MAG_ADDRESS,LSM303_OUT_X_H,6);
+  I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
   magX.buffer[1] = I2c.receive();//X
   magX.buffer[0] = I2c.receive();
   magZ.buffer[1] = I2c.receive();//Z
@@ -492,7 +619,7 @@ void CheckCRC(){
   uint16_t crc_read;
   uint8_t n_bit;
   uint16_t n_prom[8] = {
-    promSetup.val, C1.val, C2.val, C3.val, C4.val, C5.val, C6.val,promCRC.val   };
+    promSetup.val, C1.val, C2.val, C3.val, C4.val, C5.val, C6.val,promCRC.val     };
   //uint16_t n_prom[8] = {0,0,0,0,0,0,0,0};
   n_rem = 0x00;
 
@@ -641,6 +768,7 @@ void GetAltitude(float *press,float *pressInit, float *alti){
   float pressureRatio =  *press /  *pressInit;
   *alti = (1.0f - pow(pressureRatio, 0.190295f)) * 44330.0f;
 }
+
 
 
 
