@@ -38,7 +38,7 @@
 
 //mag defines ST HMC5983DLHC - will work with the HMC5883L
 #define MAG_ADDRESS 0x1E
-#define HMC5983_CRA_REG (uint8_t)0x00 
+#define HMC5983_CRA_REG (uint8_t)0x00
 #define HMC5983_CRB_REG 0x01
 #define HMC5983_MR_REG 0x02
 #define HMC5983_OUT_X_H 0x03
@@ -48,20 +48,20 @@
 #define HMC5983_ID_C 0x0C
 
 
-//however digitalWrite will work when using SPI 
-#define GyroSSOutput() DDRL |= 1<<0 
-#define GyroSSHigh() PORTL |= 1<<0 
+//however digitalWrite will work when using SPI
+#define GyroSSOutput() DDRL |= 1<<0
+#define GyroSSHigh() PORTL |= 1<<0
 #define GyroSSLow() PORTL &= ~(1<<0)
 
-#define AccSSOutput() DDRL |= 1<<1 
-#define AccSSHigh() PORTL |= 1<<1 
+#define AccSSOutput() DDRL |= 1<<1
+#define AccSSHigh() PORTL |= 1<<1
 #define AccSSLow() PORTL &= ~(1<<1)
 
-#define BaroSSOutput() DDRL |= 1<<2 
-#define BaroSSHigh() PORTL |= 1<<2 
+#define BaroSSOutput() DDRL |= 1<<2
+#define BaroSSHigh() PORTL |= 1<<2
 #define BaroSSLow() PORTL &= ~(1<<2)
 
-#define MagSSOutput() DDRL |= 1<<3 
+#define MagSSOutput() DDRL |= 1<<3
 #define MagSSHigh() PORTL |= 1<<3
 #define MagSSLow() PORTL &= ~(1<<3)
 
@@ -74,7 +74,7 @@
 #define PRESCALE_TRIG 64
 #define PERIOD_TRIG ((F_CPU/PRESCALE_TRIG/FREQ_TRIG) - 1)
 
-#define Port0 Serial 
+#define Port0 Serial
 #define RCSigPort Serial1
 #define Port2 Serial2
 #define gpsPort Serial3
@@ -154,31 +154,31 @@
 //end V2 defines
 
 
-typedef union{
+typedef union {
   float val;
   uint8_t buffer[4];
 }
 float_u;
 
-typedef union{
+typedef union {
   int32_t val;
   uint8_t buffer[4];
 }
 int32_u;
 
-typedef union{
+typedef union {
   uint32_t val;
   uint8_t buffer[4];
 }
 uint32_u;
 
-typedef union{
+typedef union {
   int16_t val;
   uint8_t buffer[2];
 }
 int16_u;
 
-typedef union{
+typedef union {
   uint16_t val;
   uint8_t buffer[2];
 }
@@ -187,15 +187,15 @@ uint16_u;
 
 //common vars
 UBLOX gps;
-int16_u gyroX,gyroY,gyroZ,accX,accY,accZ,magX,magY,magZ;
-uint8_t idA,idB,idC;
+int16_u gyroX, gyroY, gyroZ, accX, accY, accZ, magX, magY, magZ;
+uint8_t idA, idB, idC;
 uint32_t printTimer;
 
 float_u gpsAlt;
 
 float_u floatLat, floatLon;
-float_u velN,velE,velD;
-float initialPressure,pressure,alti;
+float_u velN, velE, velD;
+float initialPressure, pressure, alti;
 uint32_t pollTimer;
 //end common vars
 #ifdef V1
@@ -235,7 +235,7 @@ boolean newBaro = false;
 float pressureRatio;
 int baroCount;
 float baroSum;
-long pressureInitial; 
+long pressureInitial;
 #endif//#ifdef V1
 //end v1 vars
 
@@ -243,12 +243,12 @@ long pressureInitial;
 //v2 vars
 #ifdef V2
 //barometer
-uint16_u C1,C2,C3,C4,C5,C6,promSetup,promCRC;
+uint16_u C1, C2, C3, C4, C5, C6, promSetup, promCRC;
 uint32_u D_rcvd;
-float D1,D2;
-float pres,temperature,dT,TEMP,OFF,SENS,P;
+float D1, D2;
+float pres, temperature, dT, TEMP, OFF, SENS, P;
 uint8_t baroState;
-uint32_t baroRateTimer,baroDelayTimer;
+uint32_t baroRateTimer, baroDelayTimer;
 boolean newBaro;
 
 
@@ -277,7 +277,7 @@ boolean newBaro;
 
 
 
-void setup(){
+void setup() {
   Serial.begin(115200);
 
   GyroSSOutput();
@@ -300,19 +300,19 @@ void setup(){
    pinMode(13,OUTPUT);
    digitalWrite(13,HIGH);*/
 
-  pinMode(RED,OUTPUT);
-  digitalWrite(RED,LOW);
-  pinMode(GREEN,OUTPUT);
-  digitalWrite(GREEN,LOW);
-  pinMode(YELLOW,OUTPUT);
-  digitalWrite(YELLOW,LOW);
-  pinMode(13,OUTPUT);
-  digitalWrite(13,LOW);
-  digitalWrite(GREEN,LOW);
+  pinMode(RED, OUTPUT);
+  digitalWrite(RED, LOW);
+  pinMode(GREEN, OUTPUT);
+  digitalWrite(GREEN, LOW);
+  pinMode(YELLOW, OUTPUT);
+  digitalWrite(YELLOW, LOW);
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+  digitalWrite(GREEN, LOW);
 
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);   
+  SPI.setClockDivider(SPI_CLOCK_DIV2);
   SPI.setDataMode(SPI_MODE0);
   I2c.begin();
   I2c.setSpeed(1);
@@ -324,14 +324,14 @@ void setup(){
   MagInit();
 }
 
-void loop(){
+void loop() {
 
   PollPressure();
-  if (newBaro == true){
+  if (newBaro == true) {
     newBaro = false;
-    GetAltitude(&pressure,&initialPressure,&alti);
+    GetAltitude(&pressure, &initialPressure, &alti);
   }
-  if (micros() - pollTimer > 10000){
+  if (micros() - pollTimer > 10000) {
     pollTimer = micros();
     GetGyro();
     GetAcc();
@@ -343,22 +343,22 @@ void loop(){
      <<","<<magX.val<<","<<magY.val<<","<<magZ.val
      <<","<<temperature<<","<<pressure<<"\r\n";*/
   }
-  if (millis() - printTimer > 100){
+  if (millis() - printTimer > 100) {
     printTimer = millis();
     //Serial<<accX.val<<"   "<<accY.val<<"   "<<accZ.val<<"\r\n";
     //Serial<<magX.val<<","<<magY.val<<","<<magZ.val<<"\r\n";
     //Serial<<_HEX(idA)<<","<<_HEX(idB)<<","<<_HEX(idC)<<"\r\n";
 
-    Serial<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val
-     <<","<<accX.val<<","<<accY.val<<","<<accZ.val
-     <<","<<magX.val<<","<<magY.val<<","<<magZ.val
-     <<","<<temperature<<","<<pressure<<","<<alti<<","<<initialPressure<<"\r\n";
+    Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
+           << "," << accX.val << "," << accY.val << "," << accZ.val
+           << "," << magX.val << "," << magY.val << "," << magZ.val
+           << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
     //Serial<<accX.val<<","<<accY.val<<","<<accZ.val<<"\r\n";
     //Serial<<accX.val<<"   "<<accY.val<<"   "<<accZ.val<<"\r\n";
     //Serial<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val<<"\r\n";
   }
   gps.Monitor();
-  if (gps.newData == true){
+  if (gps.newData == true) {
 
     gps.newData = false;
 
@@ -369,8 +369,8 @@ void loop(){
     velE.val = gps.data.vars.velE * 0.01;
     velD.val = gps.data.vars.velD * 0.01;
 
-    Serial<<floatLat.val<<","<<floatLon.val<<","<<gpsAlt.val<<","<<velN.val<<","<<velE.val<<","<<velD.val<<","
-      <<gps.data.vars.gpsFix<<","<< gps.data.vars.numSV<<","<<gps.data.vars.hAcc<<","<<gps.data.vars.sAcc<<","<<gps.data.vars.pDop<<"\r\n";
+    Serial << floatLat.val << "," << floatLon.val << "," << gpsAlt.val << "," << velN.val << "," << velE.val << "," << velD.val << ","
+           << gps.data.vars.gpsFix << "," << gps.data.vars.numSV << "," << gps.data.vars.hAcc << "," << gps.data.vars.sAcc << "," << gps.data.vars.pDop << "\r\n";
 
   }
 
@@ -384,7 +384,7 @@ void loop(){
 }
 
 
-void GetMagID(){
+void GetMagID() {
   MagSSLow();
   //I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
   SPI.transfer(HMC5983_ID_A | READ | MULTI);
@@ -393,14 +393,14 @@ void GetMagID(){
   idB = SPI.transfer(0x00);
   idC = SPI.transfer(0x00);//Z
 
-  MagSSHigh();  
+  MagSSHigh();
 }
-void GetMag(){
+void GetMag() {
   /* //SPI.setDataMode(SPI_MODE0);
    MagSSLow();
    //I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
    SPI.transfer(HMC5983_OUT_X_H | READ | MULTI);
-   
+
    magX.buffer[1] = SPI.transfer(0x00);//X
    magX.buffer[0] = SPI.transfer(0x00);
    magZ.buffer[1] = SPI.transfer(0x00);//Z
@@ -409,7 +409,7 @@ void GetMag(){
    magY.buffer[0] = SPI.transfer(0x00);
    MagSSHigh();*/
 
-  I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
+  I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
   magX.buffer[1] = I2c.receive();//X
   magX.buffer[0] = I2c.receive();
   magZ.buffer[1] = I2c.receive();//Z
@@ -418,7 +418,7 @@ void GetMag(){
   magY.buffer[0] = I2c.receive();
 }
 
-void MagInit(){
+void MagInit() {
   //SPI.setDataMode(SPI_MODE0);
   /* MagSSLow();
    SPI.transfer(HMC5983_CRA_REG | WRITE | SINGLE);
@@ -432,28 +432,28 @@ void MagInit(){
    SPI.transfer(HMC5983_MR_REG | WRITE | SINGLE);
    SPI.transfer(0x00);
    MagSSHigh();*/
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRA_REG,(uint8_t)0x9C);
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRB_REG,(uint8_t)0x60);
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_MR_REG,(uint8_t)0x00);
+  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRA_REG, (uint8_t)0x9C);
+  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRB_REG, (uint8_t)0x60);
+  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_MR_REG, (uint8_t)0x00);
 
-  I2c.read((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_ID_A,(uint8_t)3);
+  I2c.read((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_ID_A, (uint8_t)3);
 
   /*idA = I2c.receive();
    idB = I2c.receive();
    idC = I2c.receive();*/
 
-  if (I2c.receive() == 0x48){
-    Serial<<"IDA\r\n";
+  if (I2c.receive() == 0x48) {
+    Serial << "IDA\r\n";
   }
-  if (I2c.receive() == 0x34){
-    Serial<<"IDB\r\n";
+  if (I2c.receive() == 0x34) {
+    Serial << "IDB\r\n";
   }
-  if (I2c.receive() == 0x33){
-    Serial<<"IDC\r\n";
+  if (I2c.receive() == 0x33) {
+    Serial << "IDC\r\n";
   }
   //Serial<<_HEX(idA)<<","<<_HEX(idB)<<","<<_HEX(idC)<<"\r\n";
 
-  I2c.read(MAG_ADDRESS,HMC5983_OUT_X_H,6);
+  I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
   magX.buffer[1] = I2c.receive();//X
   magX.buffer[0] = I2c.receive();
   magZ.buffer[1] = I2c.receive();//Z
@@ -463,89 +463,89 @@ void MagInit(){
 }
 
 #ifdef V2
-void PollPressure(){
-  if (millis() - baroRateTimer >= BARO_CONV_TIME){
-    switch(baroState){
-    case 0://start temp conv
-      BaroSSLow();
-      SPI.transfer(CONVERT_D2_OSR4096);
-      BaroSSHigh();
-      baroState = 1;
-      baroDelayTimer = millis();
-      break;
-    case 1:
-      if (millis() - baroDelayTimer >= 10){
+void PollPressure() {
+  if (millis() - baroRateTimer >= BARO_CONV_TIME) {
+    switch (baroState) {
+      case 0://start temp conv
         BaroSSLow();
-        SPI.transfer(ADC_READ);
-        D_rcvd.buffer[2] = SPI.transfer(0x00);
-        D_rcvd.buffer[1] = SPI.transfer(0x00);
-        D_rcvd.buffer[0] = SPI.transfer(0x00);
-        D2 = (float)D_rcvd.val;
-        /*D2.buffer[2] = SPI.transfer(0x00);
-         D2.buffer[1] = SPI.transfer(0x00);
-         D2.buffer[0] = SPI.transfer(0x00);*/
+        SPI.transfer(CONVERT_D2_OSR4096);
         BaroSSHigh();
-        baroState = 2;
-      }
-      break;
-    case 2:
-      BaroSSLow();
-      SPI.transfer(CONVERT_D1_OSR4096);
-      BaroSSHigh();
-      baroState = 3;
-      baroDelayTimer = millis();
-      break;
-    case 3:
-      if (millis() - baroDelayTimer >= 10){
+        baroState = 1;
+        baroDelayTimer = millis();
+        break;
+      case 1:
+        if (millis() - baroDelayTimer >= 10) {
+          BaroSSLow();
+          SPI.transfer(ADC_READ);
+          D_rcvd.buffer[2] = SPI.transfer(0x00);
+          D_rcvd.buffer[1] = SPI.transfer(0x00);
+          D_rcvd.buffer[0] = SPI.transfer(0x00);
+          D2 = (float)D_rcvd.val;
+          /*D2.buffer[2] = SPI.transfer(0x00);
+           D2.buffer[1] = SPI.transfer(0x00);
+           D2.buffer[0] = SPI.transfer(0x00);*/
+          BaroSSHigh();
+          baroState = 2;
+        }
+        break;
+      case 2:
         BaroSSLow();
-        SPI.transfer(ADC_READ);
-        D_rcvd.buffer[2] = SPI.transfer(0x00);
-        D_rcvd.buffer[1] = SPI.transfer(0x00);
-        D_rcvd.buffer[0] = SPI.transfer(0x00);
-        D1 = (float)D_rcvd.val;
-        /*D1.buffer[2] = SPI.transfer(0x00);
-         D1.buffer[1] = SPI.transfer(0x00);
-         D1.buffer[0] = SPI.transfer(0x00);*/
+        SPI.transfer(CONVERT_D1_OSR4096);
         BaroSSHigh();
-        baroState = 0;
-        baroRateTimer = millis();
-        GetBaro();
-        newBaro = true;
-      }
-      break;
+        baroState = 3;
+        baroDelayTimer = millis();
+        break;
+      case 3:
+        if (millis() - baroDelayTimer >= 10) {
+          BaroSSLow();
+          SPI.transfer(ADC_READ);
+          D_rcvd.buffer[2] = SPI.transfer(0x00);
+          D_rcvd.buffer[1] = SPI.transfer(0x00);
+          D_rcvd.buffer[0] = SPI.transfer(0x00);
+          D1 = (float)D_rcvd.val;
+          /*D1.buffer[2] = SPI.transfer(0x00);
+           D1.buffer[1] = SPI.transfer(0x00);
+           D1.buffer[0] = SPI.transfer(0x00);*/
+          BaroSSHigh();
+          baroState = 0;
+          baroRateTimer = millis();
+          GetBaro();
+          newBaro = true;
+        }
+        break;
     }
   }
 }
 
 
 
-void GetBaro(){
+void GetBaro() {
 
 
-  dT = D2-(((uint32_t)C5.val)<<8);
-  TEMP = (dT * C6.val)/8388608;
+  dT = D2 - (((uint32_t)C5.val) << 8);
+  TEMP = (dT * C6.val) / 8388608;
   OFF = C2.val * 65536.0 + (C4.val * dT) / 128;
   SENS = C1.val * 32768.0 + (C3.val * dT) / 256;
 
   if (TEMP < 0) {
     // second order temperature compensation when under 20 degrees C
-    float T2 = (dT*dT) / 0x80000000;
-    float Aux = TEMP*TEMP;
-    float OFF2 = 2.5*Aux;
-    float SENS2 = 1.25*Aux;
+    float T2 = (dT * dT) / 0x80000000;
+    float Aux = TEMP * TEMP;
+    float OFF2 = 2.5 * Aux;
+    float SENS2 = 1.25 * Aux;
     TEMP = TEMP - T2;
     OFF = OFF - OFF2;
     SENS = SENS - SENS2;
   }
 
-  P = (D1*SENS/2097152 - OFF)/32768;
+  P = (D1 * SENS / 2097152 - OFF) / 32768;
   temperature = TEMP + 2000;
   pressure = P;
 
 
 }
 
-void BaroInit(){
+void BaroInit() {
   BaroSSLow();
   SPI.transfer(MS5611_RESET);
   BaroSSHigh();
@@ -599,29 +599,30 @@ void BaroInit(){
   promCRC.buffer[0] = SPI.transfer(0x00);
   BaroSSHigh();
 
-  Serial<<C1.val<<","<<C2.val<<","<<C3.val<<","<<C4.val<<","<<C5.val<<","<<C6.val<<"\r\n";
+  Serial << C1.val << "," << C2.val << "," << C3.val << "," << C4.val << "," << C5.val << "," << C6.val << "\r\n";
 
   CheckCRC();
 
 
   baroRateTimer = millis();
-  while(newBaro == false){
+  while (newBaro == false) {
     PollPressure();
   }
-  if (newBaro == true){
+  if (newBaro == true) {
     newBaro = false;
     initialPressure = pressure;
   }
 
 }
 
-void CheckCRC(){
+void CheckCRC() {
   int16_t cnt;
   uint16_t n_rem;
   uint16_t crc_read;
   uint8_t n_bit;
   uint16_t n_prom[8] = {
-    promSetup.val, C1.val, C2.val, C3.val, C4.val, C5.val, C6.val,promCRC.val     };
+    promSetup.val, C1.val, C2.val, C3.val, C4.val, C5.val, C6.val, promCRC.val
+  };
   //uint16_t n_prom[8] = {0,0,0,0,0,0,0,0};
   n_rem = 0x00;
 
@@ -633,7 +634,7 @@ void CheckCRC(){
     if (cnt & 1) {
       n_rem ^= (uint8_t)((n_prom[cnt >> 1]) & 0x00FF);
 
-    } 
+    }
     else {
       n_rem ^= (uint8_t)(n_prom[cnt >> 1] >> 8);
     }
@@ -642,7 +643,7 @@ void CheckCRC(){
       if (n_rem & 0x8000) {
         n_rem = (n_rem << 1) ^ 0x3000;
 
-      } 
+      }
       else {
         n_rem = (n_rem << 1);
       }
@@ -653,16 +654,16 @@ void CheckCRC(){
   n_prom[7] = crc_read;
 
 
-  if ((0x000F & crc_read) == (n_rem ^ 0x00)){
-    Serial<<"CRC passed\r\n";
+  if ((0x000F & crc_read) == (n_rem ^ 0x00)) {
+    Serial << "CRC passed\r\n";
   }
-  else{
-    Serial<<"CRC failed\r\n";
+  else {
+    Serial << "CRC failed\r\n";
   }
 }
 
 
-void GetAcc(){
+void GetAcc() {
   AccSSLow();
   SPI.transfer(OUT_X_L_A | READ | MULTI);
   accX.buffer[0] = SPI.transfer(0x00);
@@ -671,14 +672,14 @@ void GetAcc(){
   accY.buffer[1] = SPI.transfer(0x00);
   accZ.buffer[0] = SPI.transfer(0x00);
   accZ.buffer[1] = SPI.transfer(0x00);
-  accX.val = accX.val>>4;
-  accY.val = accY.val>>4;
-  accZ.val = accZ.val>>4;
+  accX.val = accX.val >> 4;
+  accY.val = accY.val >> 4;
+  accZ.val = accZ.val >> 4;
 
   AccSSHigh();
 
 }
-void AccInit(){
+void AccInit() {
   AccSSLow();
   SPI.transfer(CTRL_REG1_A | WRITE | SINGLE);
   SPI.transfer(0x77);//400Hz all axes enabled
@@ -715,109 +716,109 @@ void AccInit(){
 #endif//#ifdef V2
 
 #ifdef V1
-void PollPressure(void){
-  if (millis() - baroPollTimer > POLL_RATE){
-    switch (pressureState){
-    case 0://read ut
-      StartUT();
-      pressureState = 1;
-      baroTimer = millis();
-      break;
-    case 1://wait for ready signal
-      if (millis() - baroTimer > 5){
-        pressureState = 2;
-        ut = ReadUT();
-        StartUP();
+void PollPressure(void) {
+  if (millis() - baroPollTimer > POLL_RATE) {
+    switch (pressureState) {
+      case 0://read ut
+        StartUT();
+        pressureState = 1;
         baroTimer = millis();
-      }
+        break;
+      case 1://wait for ready signal
+        if (millis() - baroTimer > 5) {
+          pressureState = 2;
+          ut = ReadUT();
+          StartUP();
+          baroTimer = millis();
+        }
 
-      break;
-    case 2://read up
-      if (millis() - baroTimer > CONV_TIME){
-        up = ReadUP();
-        temperature = Temperature(ut);
-        pressure = (float)Pressure(up);
-        pressureState = 0;
-        newBaro = true;
-        baroPollTimer = millis();
-      }
-      break;
+        break;
+      case 2://read up
+        if (millis() - baroTimer > CONV_TIME) {
+          up = ReadUP();
+          temperature = Temperature(ut);
+          pressure = (float)Pressure(up);
+          pressureState = 0;
+          newBaro = true;
+          baroPollTimer = millis();
+        }
+        break;
 
     }
   }
 }
 
-long Pressure(unsigned long up){
+long Pressure(unsigned long up) {
 
 
   b6 = b5 - 4000;
   // Calculate B3
-  x1 = (b2 * (b6 * b6)>>12)>>11;
-  x2 = (ac2 * b6)>>11;
+  x1 = (b2 * (b6 * b6) >> 12) >> 11;
+  x2 = (ac2 * b6) >> 11;
   x3 = x1 + x2;
-  b3 = (((((long)ac1)*4 + x3)<<OSS) + 2)>>2;
+  b3 = (((((long)ac1) * 4 + x3) << OSS) + 2) >> 2;
 
   // Calculate B4
-  x1 = (ac3 * b6)>>13;
-  x2 = (b1 * ((b6 * b6)>>12))>>16;
-  x3 = ((x1 + x2) + 2)>>2;
-  b4 = (ac4 * (unsigned long)(x3 + 32768))>>15;
+  x1 = (ac3 * b6) >> 13;
+  x2 = (b1 * ((b6 * b6) >> 12)) >> 16;
+  x3 = ((x1 + x2) + 2) >> 2;
+  b4 = (ac4 * (unsigned long)(x3 + 32768)) >> 15;
 
-  b7 = ((unsigned long)(up - b3) * (50000>>OSS));
+  b7 = ((unsigned long)(up - b3) * (50000 >> OSS));
   if (b7 < 0x80000000)
-    p = (b7<<1)/b4;
+    p = (b7 << 1) / b4;
   else
-    p = (b7/b4)<<1;
+    p = (b7 / b4) << 1;
 
-  x1 = (p>>8) * (p>>8);
-  x1 = (x1 * 3038)>>16;
-  x2 = (-7357 * p)>>16;
-  p += (x1 + x2 + 3791)>>4;
+  x1 = (p >> 8) * (p >> 8);
+  x1 = (x1 * 3038) >> 16;
+  x2 = (-7357 * p) >> 16;
+  p += (x1 + x2 + 3791) >> 4;
 
   return p;
 }
 
-short Temperature(unsigned int ut){
+short Temperature(unsigned int ut) {
 
-  x1 = (((long)ut - (long)ac6)*(long)ac5) >> 15;
-  x2 = ((long)mc << 11)/(x1 + md);
+  x1 = (((long)ut - (long)ac6) * (long)ac5) >> 15;
+  x2 = ((long)mc << 11) / (x1 + md);
   b5 = x1 + x2;
 
-  return ((b5 + 8)>>4);
+  return ((b5 + 8) >> 4);
 }
 
-void StartUT(void){
-  I2c.write(BMP085_ADDRESS,0xF4,0x2E);
+void StartUT(void) {
+  I2c.write(BMP085_ADDRESS, 0xF4, 0x2E);
 }
 
-unsigned int ReadUT(void){
+unsigned int ReadUT(void) {
 
 
 
-  I2c.read(BMP085_ADDRESS,0xF6,2);
+  I2c.read(BMP085_ADDRESS, 0xF6, 2);
   msb = I2c.receive();
   lsb = I2c.receive();
 
   return ((msb << 8) | lsb);
 }
 
-void StartUP(void){
-  I2c.write(BMP085_ADDRESS,0xF4,(0x34 + (OSS<<6)));
+void StartUP(void) {
+  I2c.write(BMP085_ADDRESS, 0xF4, (0x34 + (OSS << 6)));
 }
 
-unsigned long ReadUP(void){
+unsigned long ReadUP(void) {
 
-  I2c.read(BMP085_ADDRESS,0xF6,3);
+  I2c.read(BMP085_ADDRESS, 0xF6, 3);
   msb = I2c.receive();
   lsb = I2c.receive();
   xlsb = I2c.receive();
-  return ((((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8-OSS));
+  return ((((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8 - OSS));
 }
 
-void BaroInit(void){
+void BaroInit(void) {
   pressureState = 0;
   newBaro = false;
-  I2c.read(BMP085_ADDRESS,0xAA,22);
+  I2c.read(BMP085_ADDRESS, 0xAA, 22);
   msb = I2c.receive();
   lsb = I2c.receive();
   ac1 = (msb << 8) | lsb;
@@ -866,20 +867,20 @@ void BaroInit(void){
   //higher pressure than this means negative altitude
   baroCount = 0;
   baroSum = 0;
-  while (baroCount < 10){//use a while instead of a for loop because the for loop runs too fast
+  while (baroCount < 10) { //use a while instead of a for loop because the for loop runs too fast
     PollPressure();
-    if (newBaro == true){
+    if (newBaro == true) {
       newBaro = false;
       baroCount++;
       baroSum += pressure;
-    }    
+    }
   }
-  initialPressure = baroSum / 10;   
+  initialPressure = baroSum / 10;
 
 
 
 }
-void AccInit(){
+void AccInit() {
 
   SPI.setDataMode(SPI_MODE3);
 
@@ -901,12 +902,9 @@ void AccInit(){
 
   GetAcc();
 
-  accY.val *= -1;
-  accZ.val *= -1;
-
 }
 
-void GetAcc(){
+void GetAcc() {
   SPI.setDataMode(SPI_MODE3);
   AccSSLow();
   SPI.transfer(DATAX0 | READ | MULTI);
@@ -916,7 +914,7 @@ void GetAcc(){
   accY.buffer[1] = SPI.transfer(0x00);
   accZ.buffer[0] = SPI.transfer(0x00);
   accZ.buffer[1] = SPI.transfer(0x00);
-  AccSSHigh();  
+  AccSSHigh();
   SPI.setDataMode(SPI_MODE0);
 
   accY.val *= -1;
@@ -929,11 +927,11 @@ void GetAcc(){
 
 
 #endif//#ifdef V1
-void GyroInit(){
+void GyroInit() {
 
   GyroSSLow();
   SPI.transfer(L3G_WHO_AM_I  | READ | SINGLE);
-  Serial<<_HEX(SPI.transfer(0x00))<<"\r\n";
+  Serial << _HEX(SPI.transfer(0x00)) << "\r\n";
   GyroSSHigh();
 
   GyroSSLow();
@@ -963,7 +961,7 @@ void GyroInit(){
   GyroSSHigh();
 }
 
-void GetGyro(){
+void GetGyro() {
 
   GyroSSLow();
   SPI.transfer(L3G_OUT_X_L  | READ | MULTI);
@@ -975,7 +973,16 @@ void GetGyro(){
   gyroZ.buffer[1] = SPI.transfer(0x00);
 
   GyroSSHigh();
-
+#ifdef V1
+  gyroY.val *= -1;
+  gyroZ.val *= -1;
+#endif
+#ifdef ROT_45
+  tempX = gyroX.val *  0.7071067 + gyroY.val * 0.7071067;
+  tempY = gyroX.val * -0.7071067 + gyroY.val * 0.7071067;
+  gyroX.val = tempX;
+  gyroY.val = tempY;
+#endif
 
 }
 
@@ -985,7 +992,7 @@ void GetGyro(){
 
 
 
-void GetAltitude(float *press,float *pressInit, float *alti){
+void GetAltitude(float *press, float *pressInit, float *alti) {
   float pressureRatio =  *press /  *pressInit;
   *alti = (1.0f - pow(pressureRatio, 0.190295f)) * 44330.0f;
 }
