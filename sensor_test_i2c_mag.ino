@@ -3,8 +3,8 @@
 #include <Streaming.h>
 #include "UBLOXL.h"
 
-//#define V1
-#define V2
+#define V1
+//#define V2
 
 #ifdef V2
 #ifdef V1
@@ -148,8 +148,8 @@
 #define Motor4WriteMicros(x) OCR4A = x * 2//motor 4 is attached to pin6
 #define Motor5WriteMicros(x) OCR4B = x * 2//motor 1 is attached to pin7
 #define Motor6WriteMicros(x) OCR4C = x * 2//motor 2 is attached to pin8
-//#define Motor7WriteMicros(x) OCR1A = x * 2//motor 3 is attached to pin11
-//#define Motor8WriteMicros(x) OCR1B = x * 2//motor 4 is attached to pin12
+#define Motor7WriteMicros(x) OCR1A = x * 2//motor 3 is attached to pin11
+#define Motor8WriteMicros(x) OCR1B = x * 2//motor 4 is attached to pin12
 #endif//#ifdef V2
 //end V2 defines
 
@@ -195,12 +195,13 @@ float_u gpsAlt;
 
 float_u floatLat, floatLon;
 float_u velN,velE,velD;
-float initialPressure,alti;
+float initialPressure,pressure,alti;
+uint32_t pollTimer;
 //end common vars
 #ifdef V1
 //v1 vars
 //barometer variables
-int32_u pressure;
+//int32_t pres;
 short temperature;
 uint32_t baroTimer;
 int pressureState;
@@ -245,12 +246,12 @@ long pressureInitial;
 uint16_u C1,C2,C3,C4,C5,C6,promSetup,promCRC;
 uint32_u D_rcvd;
 float D1,D2;
-float pressure,temperature,dT,TEMP,OFF,SENS,P;
+float pres,temperature,dT,TEMP,OFF,SENS,P;
 uint8_t baroState;
 uint32_t baroRateTimer,baroDelayTimer;
 boolean newBaro;
 
-uint32_t pollTimer;
+
 #endif//#ifdef V2
 //end barometer
 
@@ -307,9 +308,8 @@ void setup(){
   digitalWrite(YELLOW,LOW);
   pinMode(13,OUTPUT);
   digitalWrite(13,LOW);
-  digitalWrite(GREEN,HIGH);
-  while(1){
-  }
+  digitalWrite(GREEN,LOW);
+
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(SPI_CLOCK_DIV2);   
@@ -331,7 +331,7 @@ void loop(){
     newBaro = false;
     GetAltitude(&pressure,&initialPressure,&alti);
   }
-  if (micros() - pollTimer > 4545){
+  if (micros() - pollTimer > 10000){
     pollTimer = micros();
     GetGyro();
     GetAcc();
@@ -432,7 +432,7 @@ void MagInit(){
    SPI.transfer(HMC5983_MR_REG | WRITE | SINGLE);
    SPI.transfer(0x00);
    MagSSHigh();*/
-  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRA_REG,(uint8_t)0x18);
+  I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRA_REG,(uint8_t)0x9C);
   I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_CRB_REG,(uint8_t)0x60);
   I2c.write((uint8_t)MAG_ADDRESS,(uint8_t)HMC5983_MR_REG,(uint8_t)0x00);
 
@@ -461,6 +461,8 @@ void MagInit(){
   magY.buffer[1] = I2c.receive();//Y
   magY.buffer[0] = I2c.receive();
 }
+
+#ifdef V2
 void PollPressure(){
   if (millis() - baroRateTimer >= BARO_CONV_TIME){
     switch(baroState){
@@ -659,6 +661,7 @@ void CheckCRC(){
   }
 }
 
+
 void GetAcc(){
   AccSSLow();
   SPI.transfer(OUT_X_L_A | READ | MULTI);
@@ -708,6 +711,224 @@ void AccInit(){
 
 
 }
+
+#endif//#ifdef V2
+
+#ifdef V1
+void PollPressure(void){
+  if (millis() - baroPollTimer > POLL_RATE){
+    switch (pressureState){
+    case 0://read ut
+      StartUT();
+      pressureState = 1;
+      baroTimer = millis();
+      break;
+    case 1://wait for ready signal
+      if (millis() - baroTimer > 5){
+        pressureState = 2;
+        ut = ReadUT();
+        StartUP();
+        baroTimer = millis();
+      }
+
+      break;
+    case 2://read up
+      if (millis() - baroTimer > CONV_TIME){
+        up = ReadUP();
+        temperature = Temperature(ut);
+        pressure = (float)Pressure(up);
+        pressureState = 0;
+        newBaro = true;
+        baroPollTimer = millis();
+      }
+      break;
+
+    }
+  }
+}
+
+long Pressure(unsigned long up){
+
+
+  b6 = b5 - 4000;
+  // Calculate B3
+  x1 = (b2 * (b6 * b6)>>12)>>11;
+  x2 = (ac2 * b6)>>11;
+  x3 = x1 + x2;
+  b3 = (((((long)ac1)*4 + x3)<<OSS) + 2)>>2;
+
+  // Calculate B4
+  x1 = (ac3 * b6)>>13;
+  x2 = (b1 * ((b6 * b6)>>12))>>16;
+  x3 = ((x1 + x2) + 2)>>2;
+  b4 = (ac4 * (unsigned long)(x3 + 32768))>>15;
+
+  b7 = ((unsigned long)(up - b3) * (50000>>OSS));
+  if (b7 < 0x80000000)
+    p = (b7<<1)/b4;
+  else
+    p = (b7/b4)<<1;
+
+  x1 = (p>>8) * (p>>8);
+  x1 = (x1 * 3038)>>16;
+  x2 = (-7357 * p)>>16;
+  p += (x1 + x2 + 3791)>>4;
+
+  return p;
+}
+
+short Temperature(unsigned int ut){
+
+  x1 = (((long)ut - (long)ac6)*(long)ac5) >> 15;
+  x2 = ((long)mc << 11)/(x1 + md);
+  b5 = x1 + x2;
+
+  return ((b5 + 8)>>4);
+}
+
+void StartUT(void){
+  I2c.write(BMP085_ADDRESS,0xF4,0x2E);
+}
+
+unsigned int ReadUT(void){
+
+
+
+  I2c.read(BMP085_ADDRESS,0xF6,2);
+  msb = I2c.receive();
+  lsb = I2c.receive();
+
+  return ((msb << 8) | lsb);
+}
+
+void StartUP(void){
+  I2c.write(BMP085_ADDRESS,0xF4,(0x34 + (OSS<<6)));
+}
+
+unsigned long ReadUP(void){
+
+  I2c.read(BMP085_ADDRESS,0xF6,3);
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  xlsb = I2c.receive();
+  return ((((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8-OSS));
+}
+
+void BaroInit(void){
+  pressureState = 0;
+  newBaro = false;
+  I2c.read(BMP085_ADDRESS,0xAA,22);
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac1 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac2 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac3 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac4 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac5 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  ac6 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  b1 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  b2 = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  mb = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  mc = (msb << 8) | lsb;
+
+  msb = I2c.receive();
+  lsb = I2c.receive();
+  md = (msb << 8) | lsb;
+  //this is to get the ground pressure for relative altitude
+  //lower pressure than this means positive altitude
+  //higher pressure than this means negative altitude
+  baroCount = 0;
+  baroSum = 0;
+  while (baroCount < 10){//use a while instead of a for loop because the for loop runs too fast
+    PollPressure();
+    if (newBaro == true){
+      newBaro = false;
+      baroCount++;
+      baroSum += pressure;
+    }    
+  }
+  initialPressure = baroSum / 10;   
+
+
+
+}
+void AccInit(){
+
+  SPI.setDataMode(SPI_MODE3);
+
+  AccSSLow();
+  SPI.transfer(WRITE | SINGLE | BW_RATE);
+  SPI.transfer(0x0C);
+  AccSSHigh();
+
+  AccSSLow();
+  SPI.transfer(WRITE | SINGLE | POWER_CTL);
+  SPI.transfer(0x08);//start measurment
+  AccSSHigh();
+
+  AccSSLow();
+  SPI.transfer(WRITE | SINGLE | DATA_FORMAT);
+  SPI.transfer(0x08);//full resolution + / - 16g
+  AccSSHigh();
+  SPI.setDataMode(SPI_MODE0);
+
+  GetAcc();
+
+  accY.val *= -1;
+  accZ.val *= -1;
+
+}
+
+void GetAcc(){
+  SPI.setDataMode(SPI_MODE3);
+  AccSSLow();
+  SPI.transfer(DATAX0 | READ | MULTI);
+  accX.buffer[0] = SPI.transfer(0x00);
+  accX.buffer[1] = SPI.transfer(0x00);
+  accY.buffer[0] = SPI.transfer(0x00);
+  accY.buffer[1] = SPI.transfer(0x00);
+  accZ.buffer[0] = SPI.transfer(0x00);
+  accZ.buffer[1] = SPI.transfer(0x00);
+  AccSSHigh();  
+  SPI.setDataMode(SPI_MODE0);
+
+  accY.val *= -1;
+  accZ.val *= -1;
+
+
+
+
+}
+
+
+#endif//#ifdef V1
 void GyroInit(){
 
   GyroSSLow();
