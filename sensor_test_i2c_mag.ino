@@ -862,6 +862,9 @@ void BaroInit(void) {
   msb = I2c.receive();
   lsb = I2c.receive();
   md = (msb << 8) | lsb;
+  
+  I2c.read(BMP085_ADDRESS,0xD0,1);
+  Serial<<"bmp 085 "<<_HEX(I2c.receive())<<"\r\n";
   //this is to get the ground pressure for relative altitude
   //lower pressure than this means positive altitude
   //higher pressure than this means negative altitude
