@@ -3,14 +3,50 @@
 #include <Streaming.h>
 #include "UBLOXL.h"
 
-#define V1
-//#define V2
+//#define ROT_45
+
+//#define QUAD_CAMP
+
+#define QUAD
+//#define HEX_FRAME
+//#define X_8
+
+//#define V1
+#define V2
 
 #ifdef V2
 #ifdef V1
 #undef V1
 #endif
 #endif
+
+#ifdef QUAD_CAMP
+
+#ifndef V1
+#define V1
+#endif//#ifndef V1
+
+#ifndef QUAD
+#define QUAD
+#endif//#ifndef QUAD
+
+#ifdef ROT_45
+#undef ROT_45
+#endif//#ifdef ROT_45
+
+#ifdef V2
+#undef V2
+#endif//#ifdef V2
+
+#ifdef HEX_FRAME
+#undef HEX_FRAME
+#endif//#ifdef HEX_FRAME
+
+#ifdef X_8
+#undef X_8
+#endif//#ifdef X_8
+
+#endif//#ifdef QUAD_CAMP
 
 //common defines
 
@@ -257,24 +293,8 @@ boolean newBaro;
 
 //end v2 vars
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+uint8_t i2cStatusByte;
+int16_t tempX, tempY;
 
 
 void setup() {
@@ -316,7 +336,28 @@ void setup() {
   SPI.setDataMode(SPI_MODE0);
   I2c.begin();
   I2c.setSpeed(1);
-  //digitalWrite(MISO,LOW);
+  I2c.timeOut(2);
+#ifdef V1
+  Serial<<"V1\r\n";
+#endif
+#ifdef V2
+  Serial<<"V2\r\n";
+#endif
+#ifdef ROT_45
+  Serial<<"ROT_45\r\n";
+#endif
+#ifdef QUAD_CAMP
+  Serial<<"QUAD_CAMP\r\n";
+#endif
+#ifdef QUAD
+  Serial<<"QUAD\r\n";
+#endif
+#ifdef HEX_FRAME
+  Serial<<"HEX_FRAME\r\n";
+#endif
+#ifdef V2
+  Serial<<"X_8\r\n";
+#endif
   gps.init();
   BaroInit();
   GyroInit();
@@ -369,7 +410,7 @@ void loop() {
     velE.val = gps.data.vars.velE * 0.01;
     velD.val = gps.data.vars.velD * 0.01;
 
-    Serial << floatLat.val << "," << floatLon.val << "," << gpsAlt.val << "," << velN.val << "," << velE.val << "," << velD.val << ","
+    Serial <<millis()<<","<< _FLOAT(floatLat.val,7) << "," << _FLOAT(floatLon.val,7) << "," << gpsAlt.val << "," << velN.val << "," << velE.val << "," << velD.val << ","
            << gps.data.vars.gpsFix << "," << gps.data.vars.numSV << "," << gps.data.vars.hAcc << "," << gps.data.vars.sAcc << "," << gps.data.vars.pDop << "\r\n";
 
   }
@@ -409,7 +450,10 @@ void GetMag() {
    magY.buffer[0] = SPI.transfer(0x00);
    MagSSHigh();*/
 
-  I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
+  i2cStatusByte = I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
+  /*if (i2cStatusByte != 0){
+    Serial<<i2cStatusByte<<"\r\n";
+  }*/
   magX.buffer[1] = I2c.receive();//X
   magX.buffer[0] = I2c.receive();
   magZ.buffer[1] = I2c.receive();//Z
