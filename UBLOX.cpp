@@ -39,9 +39,7 @@ void DistBearing(int32_t *lat1, int32_t *lon1, int32_t *lat2, int32_t *lon2,floa
 
 
 void GPSMonitor(){
-  //Serial<<gpsPort.available()<<"\r\n";
   while (gpsPort.available() > 0){
-    // Serial.println(index);
     switch (GPSState){
     case 0:
       inByte = gpsPort.read();
@@ -92,7 +90,6 @@ void GPSMonitor(){
       if (msgLength > 40){
         GPSState = 0;
       }
-      //Serial<<msgLength<<"*\r\n";
       index = 0;
       GPSState = 6;
       break;
