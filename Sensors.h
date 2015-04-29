@@ -31,7 +31,7 @@ void MagInit();
 
 void BaroInit();
 void PollPressure();
-void GetAltitude(float*, float*, float*);
+boolean GetAltitude(float*, float*, float*);
 
 
 #endif

@@ -9,8 +9,8 @@
 //#define HEX_FRAME
 //#define X_8
 
-#define V1
-//#define V2
+//#define V1
+#define V2
 
 #ifdef V2
 #ifdef V1

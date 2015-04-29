@@ -1,6 +1,9 @@
 #include "Sensors.h"
 
 
+#ifdef ROT_45
+int16_t tempX, tempY;
+#endif
 //gyro-----------------------------------
 int16_u gyroX, gyroY, gyroZ;
 void GyroInit() {
@@ -141,7 +144,7 @@ void PollPressure() {
     switch (baroState) {
     case 0://start temp conv
       BaroSSLow();
-      SPI.transfer(CONVERT_D2_OSR4096);
+      SPITransfer(CONVERT_D2_OSR4096);
       BaroSSHigh();
       baroState = 1;
       baroDelayTimer = millis();
@@ -149,21 +152,18 @@ void PollPressure() {
     case 1:
       if (millis() - baroDelayTimer >= 10) {
         BaroSSLow();
-        SPI.transfer(ADC_READ);
-        D_rcvd.buffer[2] = SPI.transfer(0x00);
-        D_rcvd.buffer[1] = SPI.transfer(0x00);
-        D_rcvd.buffer[0] = SPI.transfer(0x00);
+        SPITransfer(ADC_READ);
+        D_rcvd.buffer[2] = SPITransfer(0x00);
+        D_rcvd.buffer[1] = SPITransfer(0x00);
+        D_rcvd.buffer[0] = SPITransfer(0x00);
         D2 = (float)D_rcvd.val;
-        /*D2.buffer[2] = SPI.transfer(0x00);
-         D2.buffer[1] = SPI.transfer(0x00);
-         D2.buffer[0] = SPI.transfer(0x00);*/
         BaroSSHigh();
         baroState = 2;
       }
       break;
     case 2:
       BaroSSLow();
-      SPI.transfer(CONVERT_D1_OSR4096);
+      SPITransfer(CONVERT_D1_OSR4096);
       BaroSSHigh();
       baroState = 3;
       baroDelayTimer = millis();
@@ -171,14 +171,11 @@ void PollPressure() {
     case 3:
       if (millis() - baroDelayTimer >= 10) {
         BaroSSLow();
-        SPI.transfer(ADC_READ);
-        D_rcvd.buffer[2] = SPI.transfer(0x00);
-        D_rcvd.buffer[1] = SPI.transfer(0x00);
-        D_rcvd.buffer[0] = SPI.transfer(0x00);
+        SPITransfer(ADC_READ);
+        D_rcvd.buffer[2] = SPITransfer(0x00);
+        D_rcvd.buffer[1] = SPITransfer(0x00);
+        D_rcvd.buffer[0] = SPITransfer(0x00);
         D1 = (float)D_rcvd.val;
-        /*D1.buffer[2] = SPI.transfer(0x00);
-         D1.buffer[1] = SPI.transfer(0x00);
-         D1.buffer[0] = SPI.transfer(0x00);*/
         BaroSSHigh();
         baroState = 0;
         baroRateTimer = millis();
@@ -220,56 +217,56 @@ void GetBaro() {
 
 void BaroInit() {
   BaroSSLow();
-  SPI.transfer(MS5611_RESET);
+  SPITransfer(MS5611_RESET);
   BaroSSHigh();
   delay(5);
 
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_Setup);
-  promSetup.buffer[1] = SPI.transfer(0x00);
-  promSetup.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_Setup);
+  promSetup.buffer[1] = SPITransfer(0x00);
+  promSetup.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C1);
-  C1.buffer[1] = SPI.transfer(0x00);
-  C1.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C1);
+  C1.buffer[1] = SPITransfer(0x00);
+  C1.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C2);
-  C2.buffer[1] = SPI.transfer(0x00);
-  C2.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C2);
+  C2.buffer[1] = SPITransfer(0x00);
+  C2.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C3);
-  C3.buffer[1] = SPI.transfer(0x00);
-  C3.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C3);
+  C3.buffer[1] = SPITransfer(0x00);
+  C3.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C4);
-  C4.buffer[1] = SPI.transfer(0x00);
-  C4.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C4);
+  C4.buffer[1] = SPITransfer(0x00);
+  C4.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C5);
-  C5.buffer[1] = SPI.transfer(0x00);
-  C5.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C5);
+  C5.buffer[1] = SPITransfer(0x00);
+  C5.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_C6);
-  C6.buffer[1] = SPI.transfer(0x00);
-  C6.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_C6);
+  C6.buffer[1] = SPITransfer(0x00);
+  C6.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
   delay(1);
   BaroSSLow();
-  SPI.transfer(MS5611_PROM_CRC);
-  promCRC.buffer[1] = SPI.transfer(0x00);
-  promCRC.buffer[0] = SPI.transfer(0x00);
+  SPITransfer(MS5611_PROM_CRC);
+  promCRC.buffer[1] = SPITransfer(0x00);
+  promCRC.buffer[0] = SPITransfer(0x00);
   BaroSSHigh();
 
   Serial << C1.val << "," << C2.val << "," << C3.val << "," << C4.val << "," << C5.val << "," << C6.val << "\r\n";
@@ -412,83 +409,83 @@ short Temperature(unsigned int ut) {
 }
 
 void StartUT(void) {
-  I2c.write(BMP085_ADDRESS, 0xF4, 0x2E);
+  I2CWrite(BMP085_ADDRESS, 0xF4, 0x2E);
 }
 
 unsigned int ReadUT(void) {
 
 
 
-  I2c.read(BMP085_ADDRESS, 0xF6, 2);
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  I2CRead(BMP085_ADDRESS, 0xF6, 2);
+  msb = I2CReceive();
+  lsb = I2CReceive();
 
   return ((msb << 8) | lsb);
 }
 
 void StartUP(void) {
-  I2c.write(BMP085_ADDRESS, 0xF4, (0x34 + (OSS << 6)));
+  I2CWrite(BMP085_ADDRESS, 0xF4, (0x34 + (OSS << 6)));
 }
 
 unsigned long ReadUP(void) {
 
-  I2c.read(BMP085_ADDRESS, 0xF6, 3);
-  msb = I2c.receive();
-  lsb = I2c.receive();
-  xlsb = I2c.receive();
+  I2CRead(BMP085_ADDRESS, 0xF6, 3);
+  msb = I2CReceive();
+  lsb = I2CReceive();
+  xlsb = I2CReceive();
   return ((((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8 - OSS));
 }
 
 void BaroInit(void) {
   pressureState = 0;
   newBaro = false;
-  I2c.read(BMP085_ADDRESS, 0xAA, 22);
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  I2CRead(BMP085_ADDRESS, 0xAA, 22);
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac1 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac2 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac3 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac4 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac5 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   ac6 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   b1 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   b2 = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   mb = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   mc = (msb << 8) | lsb;
 
-  msb = I2c.receive();
-  lsb = I2c.receive();
+  msb = I2CReceive();
+  lsb = I2CReceive();
   md = (msb << 8) | lsb;
 
-  I2c.read(BMP085_ADDRESS,0xD0,1);
-  Serial<<"bmp 085 "<<_HEX(I2c.receive())<<"\r\n";
+  I2CRead(BMP085_ADDRESS,0xD0,1);
+  Serial<<"bmp 085 "<<_HEX(I2CReceive())<<"\r\n";
   //this is to get the ground pressure for relative altitude
   //lower pressure than this means positive altitude
   //higher pressure than this means negative altitude
@@ -511,14 +508,14 @@ void BaroInit(void) {
 #endif//#ifdef V1
 
 
-void GetAltitude(float *press, float *pressInit, float *alti) {
-  /*if (*pressInit <= 0 || *press <= 0){
+boolean GetAltitude(float *press, float *pressInit, float *alti) {
+  if (*pressInit <= 0 || *press <= 0){
     *alti = 0;
     return false;
-  }*/
+  }
   float pressureRatio =  *press /  *pressInit;
   *alti = (1.0f - pow(pressureRatio, 0.190295f)) * 44330.0f;
-  //return true;
+  return true;
 }
 
 //end baro-----------------------------
@@ -532,40 +529,40 @@ int16_u  accX, accY, accZ;
 
 void AccInit() {
 
-  SPI.setDataMode(SPI_MODE3);
+  SPISetMode(SPI_MODE3);
 
   AccSSLow();
-  SPI.transfer(WRITE | SINGLE | BW_RATE);
-  SPI.transfer(0x0C);
+  SPITransfer(WRITE | SINGLE | BW_RATE);
+  SPITransfer(0x0C);
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(WRITE | SINGLE | POWER_CTL);
-  SPI.transfer(0x08);//start measurment
+  SPITransfer(WRITE | SINGLE | POWER_CTL);
+  SPITransfer(0x08);//start measurment
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(WRITE | SINGLE | DATA_FORMAT);
-  SPI.transfer(0x08);//full resolution + / - 16g
+  SPITransfer(WRITE | SINGLE | DATA_FORMAT);
+  SPITransfer(0x08);//full resolution + / - 16g
   AccSSHigh();
-  SPI.setDataMode(SPI_MODE0);
+  SPISetMode(SPI_MODE0);
 
   GetAcc();
 
 }
 
 void GetAcc() {
-  SPI.setDataMode(SPI_MODE3);
+  SPISetMode(SPI_MODE3);
   AccSSLow();
-  SPI.transfer(DATAX0 | READ | MULTI);
-  accX.buffer[0] = SPI.transfer(0x00);
-  accX.buffer[1] = SPI.transfer(0x00);
-  accY.buffer[0] = SPI.transfer(0x00);
-  accY.buffer[1] = SPI.transfer(0x00);
-  accZ.buffer[0] = SPI.transfer(0x00);
-  accZ.buffer[1] = SPI.transfer(0x00);
+  SPITransfer(DATAX0 | READ | MULTI);
+  accX.buffer[0] = SPITransfer(0x00);
+  accX.buffer[1] = SPITransfer(0x00);
+  accY.buffer[0] = SPITransfer(0x00);
+  accY.buffer[1] = SPITransfer(0x00);
+  accZ.buffer[0] = SPITransfer(0x00);
+  accZ.buffer[1] = SPITransfer(0x00);
   AccSSHigh();
-  SPI.setDataMode(SPI_MODE0);
+  SPISetMode(SPI_MODE0);
 
   accY.val *= -1;
   accZ.val *= -1;
@@ -580,13 +577,13 @@ void GetAcc() {
 
 void GetAcc() {
   AccSSLow();
-  SPI.transfer(OUT_X_L_A | READ | MULTI);
-  accX.buffer[0] = SPI.transfer(0x00);
-  accX.buffer[1] = SPI.transfer(0x00);
-  accY.buffer[0] = SPI.transfer(0x00);
-  accY.buffer[1] = SPI.transfer(0x00);
-  accZ.buffer[0] = SPI.transfer(0x00);
-  accZ.buffer[1] = SPI.transfer(0x00);
+  SPITransfer(OUT_X_L_A | READ | MULTI);
+  accX.buffer[0] = SPITransfer(0x00);
+  accX.buffer[1] = SPITransfer(0x00);
+  accY.buffer[0] = SPITransfer(0x00);
+  accY.buffer[1] = SPITransfer(0x00);
+  accZ.buffer[0] = SPITransfer(0x00);
+  accZ.buffer[1] = SPITransfer(0x00);
   accX.val = accX.val >> 4;
   accY.val = accY.val >> 4;
   accZ.val = accZ.val >> 4;
@@ -596,33 +593,33 @@ void GetAcc() {
 }
 void AccInit() {
   AccSSLow();
-  SPI.transfer(CTRL_REG1_A | WRITE | SINGLE);
-  SPI.transfer(0x77);//400Hz all axes enabled
+  SPITransfer(CTRL_REG1_A | WRITE | SINGLE);
+  SPITransfer(0x77);//400Hz all axes enabled
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(CTRL_REG2_A | WRITE | SINGLE);
-  SPI.transfer(0x00);//high pass filter not used
+  SPITransfer(CTRL_REG2_A | WRITE | SINGLE);
+  SPITransfer(0x00);//high pass filter not used
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(CTRL_REG3_A | WRITE | SINGLE);
-  SPI.transfer(0x00);//not using interrupts for polling sensor
+  SPITransfer(CTRL_REG3_A | WRITE | SINGLE);
+  SPITransfer(0x00);//not using interrupts for polling sensor
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(CTRL_REG4_A | WRITE | SINGLE);
-  SPI.transfer(0x18);//little endian
+  SPITransfer(CTRL_REG4_A | WRITE | SINGLE);
+  SPITransfer(0x18);//little endian
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(CTRL_REG5_A | WRITE | SINGLE);
-  SPI.transfer(0x00);//not using interrupts for polling sensor
+  SPITransfer(CTRL_REG5_A | WRITE | SINGLE);
+  SPITransfer(0x00);//not using interrupts for polling sensor
   AccSSHigh();
 
   AccSSLow();
-  SPI.transfer(CTRL_REG6_A | WRITE | SINGLE);
-  SPI.transfer(0x00);//not using interrupts for polling sensor
+  SPITransfer(CTRL_REG6_A | WRITE | SINGLE);
+  SPITransfer(0x00);//not using interrupts for polling sensor
   AccSSHigh();
 
 
@@ -638,19 +635,19 @@ uint8_t i2cTimeOutStatus,i2cTimeOutCount;
 void VerifyMag();
 
 void VerifyMag() {
-  I2c.read((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_ID_A, (uint8_t)3);
+  I2CRead((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_ID_A, (uint8_t)3);
   
-  if (I2c.receive() != 0x48) {
+  if (I2CReceive() != 0x48) {
     Serial<<"id1\r\n";
     return;
   }
 
-  if (I2c.receive() != 0x34) {
+  if (I2CReceive() != 0x34) {
     Serial<<"id2\r\n";
     return;
   }
 
-  if (I2c.receive() != 0x33) {
+  if (I2CReceive() != 0x33) {
     Serial<<"id3\r\n";
     return;
   }
@@ -658,22 +655,22 @@ void VerifyMag() {
 
 void MagInit() {
   //continous conversion 220Hz
-  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRA_REG, (uint8_t)0x9C);
-  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRB_REG, (uint8_t)0x60);
-  I2c.write((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_MR_REG, (uint8_t)0x80);
+  I2CWrite((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRA_REG, (uint8_t)0x9C);
+  I2CWrite((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_CRB_REG, (uint8_t)0x60);
+  I2CWrite((uint8_t)MAG_ADDRESS, (uint8_t)HMC5983_MR_REG, (uint8_t)0x80);
 
 
   VerifyMag();
 
 
 
-  I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
-  magX.buffer[1] = I2c.receive();//X
-  magX.buffer[0] = I2c.receive();
-  magZ.buffer[1] = I2c.receive();//Z
-  magZ.buffer[0] = I2c.receive();
-  magY.buffer[1] = I2c.receive();//Y
-  magY.buffer[0] = I2c.receive();
+  I2CRead(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
+  magX.buffer[1] = I2CReceive();//X
+  magX.buffer[0] = I2CReceive();
+  magZ.buffer[1] = I2CReceive();//Z
+  magZ.buffer[0] = I2CReceive();
+  magY.buffer[1] = I2CReceive();//Y
+  magY.buffer[0] = I2CReceive();
 #ifdef V1
 #ifndef EXT_MAG
       magY.val *= -1;
@@ -684,7 +681,7 @@ void MagInit() {
 
 }
 void GetMag() {
-  i2cTimeOutStatus = I2c.read(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
+  i2cTimeOutStatus = I2CRead(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
   if (i2cTimeOutCount == 10){
     //imu.magDetected = false;
     Serial<<"mag lost\re\n";
@@ -695,12 +692,12 @@ void GetMag() {
     return;
   }
   i2cTimeOutCount = 0;
-  magX.buffer[1] = I2c.receive();//X
-  magX.buffer[0] = I2c.receive();
-  magZ.buffer[1] = I2c.receive();//Z
-  magZ.buffer[0] = I2c.receive();
-  magY.buffer[1] = I2c.receive();//Y
-  magY.buffer[0] = I2c.receive();
+  magX.buffer[1] = I2CReceive();//X
+  magX.buffer[0] = I2CReceive();
+  magZ.buffer[1] = I2CReceive();//Z
+  magZ.buffer[0] = I2CReceive();
+  magY.buffer[1] = I2CReceive();//Y
+  magY.buffer[0] = I2CReceive();
 #ifdef V1
 #ifndef EXT_MAG
       magY.val *= -1;
