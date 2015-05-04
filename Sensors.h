@@ -13,6 +13,7 @@ extern int16_u  accX, accY, accZ;
 extern int16_u magX,magY,magZ;
 extern float initialPressure, pressure, alti;
 extern boolean newBaro;
+
 #ifdef V1
 extern short temperature;
 #endif

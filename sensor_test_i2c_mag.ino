@@ -64,10 +64,10 @@ void loop() {
   if (millis() - printTimer > 100) {
     printTimer = millis();
 
-    /* Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
+     Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
      << "," << accX.val << "," << accY.val << "," << accZ.val
      << "," << magX.val << "," << magY.val << "," << magZ.val
-     << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";*/
+     << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
 
   }
   GPSMonitor();

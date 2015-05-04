@@ -684,7 +684,7 @@ void GetMag() {
   i2cTimeOutStatus = I2CRead(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
   if (i2cTimeOutCount == 10){
     //imu.magDetected = false;
-    Serial<<"mag lost\re\n";
+    Serial<<"mag lost\r\n";
     return;
   }
   if (i2cTimeOutStatus != 0){
