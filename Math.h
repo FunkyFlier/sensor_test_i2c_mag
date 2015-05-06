@@ -1,5 +1,5 @@
-#ifndef AUXMATH_h
-#define AUXMATH_h
+#ifndef MATH_h
+#define MATH_h
 
 #include <Arduino.h>
 //#include <Streaming.h>
@@ -18,10 +18,9 @@ float InvSqrt(float);
 void MapVar (volatile int16_t*, float*, float, float, float, float);
 void MapVar ( float* , float* , int16_t,int16_t, int16_t , int16_t );
 
+void LPF(float*, float*, float*, float);
+
 #endif 
-
-
-
 
 
 

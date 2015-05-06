@@ -1,6 +1,9 @@
 #include "Sensors.h"
 
 
+
+
+
 #ifdef ROT_45
 int16_t tempX, tempY;
 #endif
@@ -566,7 +569,12 @@ void GetAcc() {
 
   accY.val *= -1;
   accZ.val *= -1;
-
+#ifdef ROT_45
+  tempX = accX.val *  0.7071067 + accY.val * 0.7071067;
+  tempY = accX.val * -0.7071067 + accY.val * 0.7071067;
+  accX.val = tempX;
+  accY.val = tempY;
+#endif
 
 
 
@@ -589,6 +597,12 @@ void GetAcc() {
   accZ.val = accZ.val >> 4;
 
   AccSSHigh();
+#ifdef ROT_45
+  tempX = accX.val *  0.7071067 + accY.val * 0.7071067;
+  tempY = accX.val * -0.7071067 + accY.val * 0.7071067;
+  accX.val = tempX;
+  accY.val = tempY;
+#endif
 
 }
 void AccInit() {

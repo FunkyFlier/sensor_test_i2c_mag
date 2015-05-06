@@ -1,4 +1,12 @@
-#include "AUXMATH.h"
+#include "Math.h"
+
+void LPF(float *output, float *input ,float *dt,float TIME_CONST){
+  float alpha,beta;
+  alpha = *dt/(*dt + TIME_CONST);
+  beta = 1.0 - alpha;
+  *output = *output * beta + *input * alpha;
+}
+
 
 float FastAtan2( float y, float x)
 {

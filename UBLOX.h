@@ -2,7 +2,7 @@
 #define UBLOX_h
 #include <Arduino.h>
 
-#include "AUXMATH.h"
+#include "Math.h"
 #include "Definitions.h"
 #include "Types.h"
 
@@ -34,7 +34,7 @@ GPS_Union_t;
 
 extern boolean newGPSData;
 extern GPS_Union_t GPSData;
-extern float_u gpsAlt,floatLat, floatLon,velN, velE, velD;
+extern float gpsAlt,floatLat, floatLon,velN, velE, velD;
 
 
 

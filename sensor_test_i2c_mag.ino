@@ -1,11 +1,13 @@
 #include <SPI.h>
 #include <I2C.h>
+#include <EEPROM.h>
 #include <Streaming.h>
 #include "UBLOX.h"
 #include "Types.h"
 #include "Definitions.h"
 #include "Sensors.h"
 #include "Comm.h"
+#include "Calibration.h"
 
 uint32_t pollTimer,printTimer;
 
@@ -42,6 +44,7 @@ void setup() {
   GyroInit();
   AccInit();
   MagInit();
+  LoadCalibValuesFromRom();
 
 }
 
@@ -59,25 +62,32 @@ void loop() {
     GetGyro();
     GetAcc();
     GetMag();
+    ACCScale();
+    MAGScale();
+    GyroScale();
 
   }
   if (millis() - printTimer > 100) {
     printTimer = millis();
 
-     Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
+    /*Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
      << "," << accX.val << "," << accY.val << "," << accZ.val
      << "," << magX.val << "," << magY.val << "," << magZ.val
-     << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
-
+     << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";*/
+    Serial <<degreeGyroX<<","<<degreeGyroY<<","<<degreeGyroZ 
+      <<","<< scaledAccX<<","<< scaledAccY<<","<< scaledAccZ
+      <<","<< filtAccX<<","<< filtAccY<<","<< filtAccZ
+      <<","<<scaledMagX<<","<< scaledMagY<<","<< scaledMagZ
+      <<"\r\n";
   }
-  GPSMonitor();
+  //GPSMonitor();
   if (newGPSData == true) {
 
     newGPSData = false;
 
 
 
-    Serial <<millis()<<","<< _FLOAT(floatLat.val,7) << "," << _FLOAT(floatLon.val,7) << "," << gpsAlt.val << "," << velN.val << "," << velE.val << "," << velD.val << ","
+    Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
       << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";
 
   }
@@ -111,6 +121,9 @@ void CheckDefines(){
   Serial<<"X_8\r\n";
 #endif
 }
+
+
+
 
 
 

@@ -1,5 +1,5 @@
-#ifndef Definitions.h
-#define Definitions.h
+#ifndef Definitions_h
+#define Definitions_h
 
 //#define ROT_45
 
@@ -186,6 +186,42 @@
 #define Motor8WriteMicros(x) OCR1B = x * 2//motor 4 is attached to pin12
 #endif//#ifdef V2
 //end V2 defines
+
+
+
+#define ACC_S_X_INDEX 11
+#define ACC_S_Y_INDEX 15
+#define ACC_S_Z_INDEX 19
+#define ACC_O_X_INDEX 23
+#define ACC_O_Y_INDEX 27
+#define ACC_O_Z_INDEX 31
+
+
+#define MAG_OFF_X_INDEX 35
+#define MAG_OFF_Y_INDEX 39
+#define MAG_OFF_Z_INDEX 43
+#define W_00_INDEX 47
+#define W_01_INDEX 51
+#define W_02_INDEX 55
+#define W_10_INDEX 59
+#define W_11_INDEX 63
+#define W_12_INDEX 67
+#define W_20_INDEX 71
+#define W_21_INDEX 75
+#define W_22_INDEX 79
+
+#define ACC_CALIB_START 8
+#define ACC_CALIB_END 31
+
+#define MAG_CALIB_START 32
+#define MAG_CALIB_END 79
+
+#define FC_ACC 5
+#define RC_CONST_ACC 1/(2.0 * 3.14 * FC_ACC)
+
+#define FC_BARO 3.0
+#define RC_CONST_BARO 1/(2.0 * 3.14 * FC_BARO)
+
 
 #endif//#ifndef Definitions.h
 

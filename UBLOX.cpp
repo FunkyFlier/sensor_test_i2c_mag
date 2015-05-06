@@ -13,10 +13,10 @@ GPS_Union_t GPSData;
 uint16_t msgLength;
 uint8_t index,msgLengthLSB,msgLengthMSB,msgType,inBuffer[50],localSumA,localSumB,inByte;
 
-float_u gpsAlt;
+float gpsAlt;
 
-float_u floatLat, floatLon;
-float_u velN, velE, velD;
+float floatLat, floatLon;
+float velN, velE, velD;
 
 void GPSInit(){
   gpsPort.begin(38400);
@@ -148,12 +148,12 @@ void GPSMonitor(){
     LLHFlag = false;
     VELFlag = false;
     newGPSData = true;
-    floatLat.val = GPSData.vars.lat * 0.0000001;
-    floatLon.val = GPSData.vars.lon * 0.0000001;
-    gpsAlt.val = GPSData.vars.height * 0.001;
-    velN.val = GPSData.vars.velN * 0.01;
-    velE.val = GPSData.vars.velE * 0.01;
-    velD.val = GPSData.vars.velD * 0.01;
+    floatLat = GPSData.vars.lat * 0.0000001;
+    floatLon = GPSData.vars.lon * 0.0000001;
+    gpsAlt = GPSData.vars.height * 0.001;
+    velN = GPSData.vars.velN * 0.01;
+    velE = GPSData.vars.velE * 0.01;
+    velD = GPSData.vars.velD * 0.01;
   }
 }
 
