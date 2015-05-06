@@ -3,6 +3,7 @@
 #include "Types.h"
 #include "Definitions.h"
 #include "Math.h"
+#include "Sensors.h"
 #include <EEPROM.h>
 #include <Streaming.h>
 
@@ -36,18 +37,18 @@ void SetInitialQuaternion(){
   R22 = cos(rollInRadians);
   R23 = cos(pitchInRadians)*sin(rollInRadians);
 
-  bx = mag_x * R11 + mag_z * R13;
-  by = mag_x * R21 + mag_y * R22 + mag_z * R23;
-  yawInRadians = atan2(-1.0 * by, bx) - ToRad(declination);
-
-  /*if (magDetected == true){
-   bx = mag_x * R11 + mag_z * R13;
+  /*bx = mag_x * R11 + mag_z * R13;
    by = mag_x * R21 + mag_y * R22 + mag_z * R23;
-   yawInRadians = atan2(-1.0 * by, bx) - ToRad(declination);
-   }
-   else{
-   yawInRadians = 0;
-   }*/
+   yawInRadians = atan2(-1.0 * by, bx) - ToRad(declination);*/
+
+  if (magDetected == true){
+    bx = mag_x * R11 + mag_z * R13;
+    by = mag_x * R21 + mag_y * R22 + mag_z * R23;
+    yawInRadians = atan2(-1.0 * by, bx) - ToRad(declination);
+  }
+  else{
+    yawInRadians = 0;
+  }
 
   q0 = cos(yawInRadians/2.0)*cos(pitchInRadians/2.0)*cos(rollInRadians/2.0) + sin(yawInRadians/2.0)*sin(pitchInRadians/2.0)*sin(rollInRadians/2.0); 
   q1 = cos(yawInRadians/2.0)*cos(pitchInRadians/2.0)*sin(rollInRadians/2.0) - sin(yawInRadians/2.0)*sin(pitchInRadians/2.0)*cos(rollInRadians/2.0); 
@@ -120,7 +121,7 @@ void SetVariables(){
   gro_x =  radianGyroX;
   gro_y =  radianGyroY;
   gro_z =  radianGyroZ;
-  Serial<<acc_x<<","<<acc_y<<","<<acc_z<<","<<mag_x<<","<<mag_y<<","<<mag_z<<","<<gro_x<<","<<gro_y<<","<<gro_z<<"\r\n";
+  //Serial<<acc_x<<","<<acc_y<<","<<acc_z<<","<<mag_x<<","<<mag_y<<","<<mag_z<<","<<gro_x<<","<<gro_y<<","<<gro_z<<"\r\n";
 }
 
 void GetEuler(){
@@ -146,6 +147,7 @@ void GetYaw(){
     yawInDegrees +=360;
   }
 }
+
 
 
 

@@ -38,13 +38,13 @@ void SetGyroOffsets(){
   int32_t gyroSumX=0,gyroSumY=0,gyroSumZ=0;
   int16_t gyroPrevX=0,gyroPrevY=0,gyroPrevZ=0;
 
-  GetGyro();
+  GetGro();
   gyroPrevX = gyroX.val;
   gyroPrevY = gyroY.val;
   gyroPrevZ = gyroZ.val;
 
   for (uint16_t i = 0; i < NUMBER_GYRO_SAMPLES_FOR_AVG; i ++) {
-    GetGyro();
+    GetGro();
     gyroSumX += gyroX.val;
     gyroSumY += gyroY.val;
     gyroSumZ += gyroZ.val;

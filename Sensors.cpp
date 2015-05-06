@@ -43,7 +43,7 @@ void GyroInit() {
   GyroSSHigh();
 }
 
-void GetGyro() {
+void GetGro() {
 
   GyroSSLow();
   SPITransfer(L3G_OUT_X_L  | READ | MULTI);
@@ -645,7 +645,7 @@ void AccInit() {
 //mag----------------------------------
 int16_u magX,magY,magZ;
 uint8_t i2cTimeOutStatus,i2cTimeOutCount;
-
+boolean magDetected = true;
 void VerifyMag();
 
 void VerifyMag() {
@@ -653,16 +653,19 @@ void VerifyMag() {
   
   if (I2CReceive() != 0x48) {
     Serial<<"id1\r\n";
+    magDetected = false;
     return;
   }
 
   if (I2CReceive() != 0x34) {
     Serial<<"id2\r\n";
+    magDetected = false;
     return;
   }
 
   if (I2CReceive() != 0x33) {
     Serial<<"id3\r\n";
+    magDetected = false;
     return;
   }
 }
@@ -697,6 +700,7 @@ void MagInit() {
 void GetMag() {
   i2cTimeOutStatus = I2CRead(MAG_ADDRESS, HMC5983_OUT_X_H, 6);
   if (i2cTimeOutCount == 10){
+    magDetected = false;
     //imu.magDetected = false;
     Serial<<"mag lost\r\n";
     return;

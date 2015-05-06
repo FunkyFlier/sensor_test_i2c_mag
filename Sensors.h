@@ -12,7 +12,7 @@ extern int16_u gyroX, gyroY, gyroZ;
 extern int16_u  accX, accY, accZ;
 extern int16_u magX,magY,magZ;
 extern float initialPressure, pressure, alti;
-extern boolean newBaro;
+extern boolean newBaro,magDetected;
 
 #ifdef V1
 extern short temperature;
@@ -21,7 +21,7 @@ extern short temperature;
 extern float temperature;
 #endif
 
-void GetGyro();
+void GetGro();
 void GyroInit();
 
 void GetAcc();
