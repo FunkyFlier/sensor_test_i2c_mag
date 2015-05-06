@@ -575,7 +575,7 @@ void GetAcc() {
   accX.val = tempX;
   accY.val = tempY;
 #endif
-
+  GetAcc();
 
 
 }
@@ -636,7 +636,7 @@ void AccInit() {
   SPITransfer(0x00);//not using interrupts for polling sensor
   AccSSHigh();
 
-
+  GetAcc();
 }
 #endif//#ifdef V2
 
@@ -691,7 +691,7 @@ void MagInit() {
       magZ.val *= -1;
 #endif
 #endif
-
+  GetMag();
 
 }
 void GetMag() {

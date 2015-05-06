@@ -30,7 +30,9 @@ void LoadCalibValuesFromRom(){
   LoadACC();
   LoadMAG();
   SetGyroOffsets();
-  
+  MAGScale();
+  ACCScale();
+  GROScale();
 }
 void SetGyroOffsets(){
   int32_t gyroSumX=0,gyroSumY=0,gyroSumZ=0;
@@ -200,7 +202,7 @@ void MAGScale(){
   scaledMagZ = magWInv20 * shiftedMagX + magWInv21 * shiftedMagY + magWInv22 * shiftedMagZ;
 }
 
-void GyroScale(){
+void GROScale(){
   degreeGyroX = (gyroX.val - gyroOffsetX) * 0.07;
   degreeGyroY = (gyroY.val - gyroOffsetY) * 0.07;
   degreeGyroZ = (gyroZ.val - gyroOffsetZ) * 0.07;

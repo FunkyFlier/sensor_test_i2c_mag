@@ -222,6 +222,9 @@
 #define FC_BARO 3.0
 #define RC_CONST_BARO 1/(2.0 * 3.14 * FC_BARO)
 
+#define DEC_START 328
+#define DEC_END 331
+
 
 #endif//#ifndef Definitions.h
 

@@ -8,6 +8,7 @@
 #include "Sensors.h"
 #include "Comm.h"
 #include "Calibration.h"
+#include "Attitude.h"
 
 uint32_t pollTimer,printTimer;
 
@@ -45,7 +46,10 @@ void setup() {
   AccInit();
   MagInit();
   LoadCalibValuesFromRom();
-
+  LoadAttValuesFromRom();
+  SetInitialQuaternion();
+  Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
+  while(1){}
 }
 
 
@@ -64,7 +68,7 @@ void loop() {
     GetMag();
     ACCScale();
     MAGScale();
-    GyroScale();
+    GROScale();
 
   }
   if (millis() - printTimer > 100) {

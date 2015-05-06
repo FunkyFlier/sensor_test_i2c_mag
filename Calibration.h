@@ -5,7 +5,7 @@
 void LoadCalibValuesFromRom();
 void ACCScale();
 void MAGScale();
-void GyroScale();
+void GROScale();
 void SetGyroOffsets();
 
 extern float scaledMagX, scaledMagY, scaledMagZ, scaledAccX, scaledAccY, scaledAccZ;
