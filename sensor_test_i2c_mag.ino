@@ -28,6 +28,16 @@ void setup() {
   MagSSHigh();
   FlashSSHigh();
 
+  D22Output();
+  //pinMode(22,INPUT);
+  D23Output();
+  D24Output();
+  D25Output();
+  D26Output();
+  D27Output();
+  D28Output();
+  D29Output();
+
   pinMode(RED, OUTPUT);
   digitalWrite(RED, LOW);
   pinMode(GREEN, OUTPUT);
@@ -114,11 +124,12 @@ void _400HzTask() {
   uint32_t _400HzTime;
   static uint32_t _400HzTimer;
   _400HzTime = micros();
-  if ( _400HzTime - _400HzTimer  >= 2500 ) {
+  if ( _400HzTime - _400HzTimer  >= 2500) {
     //what to do with DT calculation
-    //lpfDT = (_400HzTime - _400HzTimer) * 0.000001;
+    D22High();
     _400HzTimer = _400HzTime;
     PollAcc();
+    D22Low();
   }
 }
 
@@ -130,10 +141,10 @@ void _100HzTask(){
   if (loopTime - _100HzTimer >= 10000){
     _100HzDt = (loopTime - _100HzTimer) * 0.000001;
     _100HzTimer = loopTime;
+    D23High();
     while(_100HzState < LAST_100HZ_TASK){
       switch (_100HzState){
       case GET_GYRO:
-        //Serial<<"1\r\n";
         PollGro();
         if(magDetected == true){
           _100HzState = GET_MAG;
@@ -143,33 +154,38 @@ void _100HzTask(){
         }
         break;
       case GET_MAG:
-      //Serial<<"2\r\n";
         PollMag();  
         _100HzState = ATT_UPDATE;
         break;
       case ATT_UPDATE:
-      //Serial<<"3\r\n";
         AHRSupdate(_100HzDt);
         _100HzState = ROT_MATRIX;
         break;
       case ROT_MATRIX:
-      //Serial<<"4\r\n";
         GenerateRotationMatrix();
         _100HzState = GET_EULER;
         break;
       case GET_EULER:
-      //Serial<<"5\r\n";
         GetEuler();
+        _100HzState = POLL_GPS;
+        break;
+      case POLL_GPS:
+        GPSMonitor();
+        if (newGPSData == true) {
+          newGPSData = false;
+          Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
+            << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";
+        }
         _100HzState = LAST_100HZ_TASK;
         break;
       default:
-      //Serial<<"6\r\n";
         _100HzState = GET_GYRO;
         break;
       }
       _400HzTask();
 
     }
+    D23Low();
     _100HzState = GET_GYRO;
   }
 
@@ -214,6 +230,8 @@ void CheckDefines(){
   Serial<<"X_8\r\n";
 #endif
 }
+
+
 
 
 

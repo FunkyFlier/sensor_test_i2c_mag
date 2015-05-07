@@ -34,22 +34,43 @@ void LoadCalibValuesFromRom(){
   ACCScale();
   GROScale();
 }
+
+boolean StationaryGyro(){
+  static int16_t gyroPrevX=0,gyroPrevY=0,gyroPrevZ=0;
+  boolean stationary;
+  if ( abs(gyroPrevX - gyroX.val) > 25 || abs(gyroPrevY - gyroY.val) > 25 || abs(gyroPrevZ - gyroZ.val) > 25 ) {
+      stationary = false;
+    }else{
+      stationary = true;
+    }
+    gyroPrevX = gyroX.val;
+    gyroPrevY = gyroY.val;
+    gyroPrevZ = gyroZ.val;
+    return stationary;
+    
+}
 void SetGyroOffsets(){
   int32_t gyroSumX=0,gyroSumY=0,gyroSumZ=0;
-  int16_t gyroPrevX=0,gyroPrevY=0,gyroPrevZ=0;
+  //int16_t gyroPrevX=0,gyroPrevY=0,gyroPrevZ=0;
 
-  GetGro();
+  /*GetGro();
   gyroPrevX = gyroX.val;
   gyroPrevY = gyroY.val;
-  gyroPrevZ = gyroZ.val;
+  gyroPrevZ = gyroZ.val;*/
 
   for (uint16_t i = 0; i < NUMBER_GYRO_SAMPLES_FOR_AVG; i ++) {
     GetGro();
     gyroSumX += gyroX.val;
     gyroSumY += gyroY.val;
     gyroSumZ += gyroZ.val;
-
-    if ( abs(gyroPrevX - gyroX.val) > 25 || abs(gyroPrevY - gyroY.val) > 25 || abs(gyroPrevZ - gyroZ.val) > 25 ) {
+    
+    if (StationaryGyro() == false){
+      gyroSumX = gyroX.val;
+      gyroSumY = gyroY.val;
+      gyroSumZ = gyroZ.val;
+      i = 1;
+    }
+    /*if ( abs(gyroPrevX - gyroX.val) > 25 || abs(gyroPrevY - gyroY.val) > 25 || abs(gyroPrevZ - gyroZ.val) > 25 ) {
       gyroSumX = gyroX.val;
       gyroSumY = gyroY.val;
       gyroSumZ = gyroZ.val;
@@ -58,7 +79,7 @@ void SetGyroOffsets(){
 
     gyroPrevX = gyroX.val;
     gyroPrevY = gyroY.val;
-    gyroPrevZ = gyroZ.val;
+    gyroPrevZ = gyroZ.val;*/
 
     delay(3);
   }

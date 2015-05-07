@@ -81,6 +81,45 @@
 #define HMC5983_ID_B 0x0B
 #define HMC5983_ID_C 0x0C
 
+#define D22Output() DDRA |= 1<<0
+#define D22High() PORTA |= 1<<0
+#define D22Low() PORTA &= ~(1<<0)
+#define D22Toggle() PORTA ^= (1<<0);
+
+#define D23Output() DDRA |= 1<<1
+#define D23High() PORTA |= 1<<1
+#define D23Low() PORTA &= ~(1<<1)
+#define D23Toggle() PORTA ^= (1<<1);
+
+#define D24Output() DDRA |= 1<<2
+#define D24High() PORTA |= 1<<2
+#define D24Low() PORTA &= ~(1<<2)
+#define D24Toggle() PORTA ^= (1<<2);
+
+#define D25Output() DDRA |= 1<<3
+#define D25High() PORTA |= 1<<3
+#define D25Low() PORTA &= ~(1<<3)
+#define D25Toggle() PORTA ^= (1<<3);
+
+#define D26Output() DDRA |= 1<<4
+#define D26High() PORTA |= 1<<4
+#define D26Low() PORTA &= ~(1<<4)
+#define D26Toggle() PORTA ^= (1<<4);
+
+#define D27Output() DDRA |= 1<<5
+#define D27High() PORTA |= 1<<5
+#define D27Low() PORTA &= ~(1<<5)
+#define D27Toggle() PORTA ^= (1<<5);
+
+#define D28Output() DDRA |= 1<<6
+#define D28High() PORTA |= 1<<6
+#define D28Low() PORTA &= ~(1<<6)
+#define D28Toggle() PORTA ^= (1<<6);
+
+#define D29Output() DDRA |= 1<<7
+#define D29High() PORTA |= 1<<7
+#define D29Low() PORTA &= ~(1<<7)
+#define D29Toggle() PORTA ^= (1<<7);
 
 //however digitalWrite will work when using SPI
 #define GyroSSOutput() DDRL |= 1<<0
