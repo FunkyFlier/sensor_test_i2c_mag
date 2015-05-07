@@ -60,10 +60,8 @@ void setup() {
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
   SetInitialQuaternion();
-  //Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
-  /*while(1){
-   }*/
+
 }
 
 
@@ -74,50 +72,9 @@ void loop() {
   _100HzTask();
   if (millis() - printTimer > 100) {
     printTimer = millis();
-
     Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   }
-  /*PollPressure();
-   if (newBaro == true) {
-   newBaro = false;
-   GetAltitude(&pressure, &initialPressure, &alti);
-   }
-   if (micros() - pollTimer > 10000) {
-   pollTimer = micros();
-   GetGyro();
-   GetAcc();
-   GetMag();
-   ACCScale();
-   MAGScale();
-   GROScale();
-   
-   }
-   if (millis() - printTimer > 100) {
-   printTimer = millis();
-   
-   Serial << gyroX.val << "," << gyroY.val << "," << gyroZ.val
-   << "," << accX.val << "," << accY.val << "," << accZ.val
-   << "," << magX.val << "," << magY.val << "," << magZ.val
-   << "," << temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
-   Serial <<degreeGyroX<<","<<degreeGyroY<<","<<degreeGyroZ 
-   <<","<< scaledAccX<<","<< scaledAccY<<","<< scaledAccZ
-   <<","<< filtAccX<<","<< filtAccY<<","<< filtAccZ
-   <<","<<scaledMagX<<","<< scaledMagY<<","<< scaledMagZ
-   <<"\r\n";
-   }
-   //GPSMonitor();
-   if (newGPSData == true) {
-   
-   newGPSData = false;
-   
-   
-   
-   Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
-   << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";
-   
-   }*/
-
-
+  
 }
 
 void _400HzTask() {
@@ -176,9 +133,19 @@ void _100HzTask(){
           Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
             << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";
         }
+        _100HzState = POLL_BARO;
+        break;
+      case POLL_BARO:
+        PollPressure();
+        if (newBaro == true) {
+          newBaro = false;
+          GetAltitude(&pressure, &initialPressure, &alti);
+          Serial<< temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
+        }
+
         _100HzState = LAST_100HZ_TASK;
         break;
-      default:
+        default:
         _100HzState = GET_GYRO;
         break;
       }
@@ -230,6 +197,7 @@ void CheckDefines(){
   Serial<<"X_8\r\n";
 #endif
 }
+
 
 
 

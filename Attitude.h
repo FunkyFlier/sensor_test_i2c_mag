@@ -11,7 +11,7 @@
 void SetInitialQuaternion();
 void LoadAttValuesFromRom();
 
-void AHRSupdate(float);
+void AHRSupdate();
 void GenerateRotationMatrix();
 
 void GetEuler();
