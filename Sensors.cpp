@@ -603,7 +603,7 @@ void GetAcc() {
   accX.val = tempX;
   accY.val = tempY;
 #endif
-
+  //Serial<<"* "<<accX.val<<","<<accY.val<<","<<accZ.val<<"\r\n";
 }
 void AccInit() {
   AccSSLow();

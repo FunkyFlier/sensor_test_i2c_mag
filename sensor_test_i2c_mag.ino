@@ -11,7 +11,7 @@
 #include "Calibration.h"
 #include "Attitude.h"
 
-//uint32_t pollTimer,printTimer;
+uint32_t printTimer;
 uint32_t loopTime;
 
 void setup() {
@@ -50,9 +50,10 @@ void setup() {
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
   SetInitialQuaternion();
+  //Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
-  //while(1){
-  //}
+  /*while(1){
+   }*/
 }
 
 
@@ -61,6 +62,11 @@ void loop() {
   _400HzTask();
   loopTime = micros();
   _100HzTask();
+  if (millis() - printTimer > 100) {
+    printTimer = millis();
+
+    Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
+  }
   /*PollPressure();
    if (newBaro == true) {
    newBaro = false;
@@ -120,29 +126,49 @@ void _100HzTask(){
   static uint8_t _100HzState = 0;
   static uint32_t _100HzTimer = 0;
   float _100HzDt;
+
   if (loopTime - _100HzTimer >= 10000){
     _100HzDt = (loopTime - _100HzTimer) * 0.000001;
     _100HzTimer = loopTime;
     while(_100HzState < LAST_100HZ_TASK){
       switch (_100HzState){
       case GET_GYRO:
-        _100HzState = GET_MAG;
+        //Serial<<"1\r\n";
+        PollGro();
+        if(magDetected == true){
+          _100HzState = GET_MAG;
+        }
+        else{
+          _100HzState = ATT_UPDATE;
+        }
         break;
       case GET_MAG:
+      //Serial<<"2\r\n";
+        PollMag();  
         _100HzState = ATT_UPDATE;
         break;
-        case ATT_UPDATE:
+      case ATT_UPDATE:
+      //Serial<<"3\r\n";
+        AHRSupdate(_100HzDt);
         _100HzState = ROT_MATRIX;
         break;
       case ROT_MATRIX:
+      //Serial<<"4\r\n";
+        GenerateRotationMatrix();
+        _100HzState = GET_EULER;
+        break;
+      case GET_EULER:
+      //Serial<<"5\r\n";
+        GetEuler();
         _100HzState = LAST_100HZ_TASK;
         break;
       default:
+      //Serial<<"6\r\n";
         _100HzState = GET_GYRO;
         break;
       }
       _400HzTask();
-      
+
     }
     _100HzState = GET_GYRO;
   }
@@ -188,6 +214,11 @@ void CheckDefines(){
   Serial<<"X_8\r\n";
 #endif
 }
+
+
+
+
+
 
 
 
