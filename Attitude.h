@@ -11,7 +11,7 @@
 void SetInitialQuaternion();
 void LoadAttValuesFromRom();
 
-void AHRSupdate();
+void AHRSupdate(float);
 void GenerateRotationMatrix();
 
 void GetEuler();
@@ -23,7 +23,7 @@ extern float declination;
 extern float yawInDegrees,pitchInDegrees,rollInDegrees;
 extern float yawInRadians,pitchInRadians,rollInRadians;
 extern float R11,R12,R13,R21,R22,R23,R31,R32,R33;
-
+extern float initialAccMagnitude;
 
 
 #endif 

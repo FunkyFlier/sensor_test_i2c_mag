@@ -10,6 +10,7 @@
 #include "Comm.h"
 #include "Calibration.h"
 #include "Attitude.h"
+#include "Inertial.h"
 
 uint32_t printTimer;
 uint32_t loopTime;
@@ -17,35 +18,7 @@ uint32_t loopTime;
 void setup() {
   Serial.begin(115200);
 
-  GyroSSOutput();
-  AccSSOutput();
-  BaroSSOutput();
-  MagSSOutput();
-  FlashSSOutput();
-  GyroSSHigh();
-  AccSSHigh();
-  BaroSSHigh();
-  MagSSHigh();
-  FlashSSHigh();
-
-  D22Output();
-  //pinMode(22,INPUT);
-  D23Output();
-  D24Output();
-  D25Output();
-  D26Output();
-  D27Output();
-  D28Output();
-  D29Output();
-
-  pinMode(RED, OUTPUT);
-  digitalWrite(RED, LOW);
-  pinMode(GREEN, OUTPUT);
-  digitalWrite(GREEN, LOW);
-  pinMode(YELLOW, OUTPUT);
-  digitalWrite(YELLOW, LOW);
-  pinMode(BLUE, OUTPUT);
-  digitalWrite(BLUE, LOW);
+  SetPinModes();
 
   CheckDefines();
 
@@ -74,7 +47,7 @@ void loop() {
     printTimer = millis();
     Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   }
-  
+
 }
 
 void _400HzTask() {
@@ -124,6 +97,10 @@ void _100HzTask(){
         break;
       case GET_EULER:
         GetEuler();
+        _100HzState = GET_INERTIAL;
+        break;
+      case GET_INERTIAL:
+        GetInertial();
         _100HzState = POLL_GPS;
         break;
       case POLL_GPS:
@@ -145,7 +122,7 @@ void _100HzTask(){
 
         _100HzState = LAST_100HZ_TASK;
         break;
-        default:
+      default:
         _100HzState = GET_GYRO;
         break;
       }
@@ -199,6 +176,39 @@ void CheckDefines(){
 }
 
 
+
+
+void SetPinModes(){
+  GyroSSOutput();
+  AccSSOutput();
+  BaroSSOutput();
+  MagSSOutput();
+  FlashSSOutput();
+  GyroSSHigh();
+  AccSSHigh();
+  BaroSSHigh();
+  MagSSHigh();
+  FlashSSHigh();
+
+  D22Output();
+  //pinMode(22,INPUT);
+  D23Output();
+  D24Output();
+  D25Output();
+  D26Output();
+  D27Output();
+  D28Output();
+  D29Output();
+
+  pinMode(RED, OUTPUT);
+  digitalWrite(RED, LOW);
+  pinMode(GREEN, OUTPUT);
+  digitalWrite(GREEN, LOW);
+  pinMode(YELLOW, OUTPUT);
+  digitalWrite(YELLOW, LOW);
+  pinMode(BLUE, OUTPUT);
+  digitalWrite(BLUE, LOW);
+}
 
 
 
