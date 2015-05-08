@@ -103,12 +103,10 @@ void _100HzTask(){
         break;
       case GET_EULER:
         GetEuler();
-        //Serial<<pitchInDegrees<<","<<rollInDegrees<<","<<yawInDegrees<<"\r\n";
         _100HzState = GET_INERTIAL;
         break;
       case GET_INERTIAL:
         GetInertial();
-        //Serial<<inertialX<<","<<inertialY<<","<<inertialZ<<"\r\n";
         _100HzState = POS_VEL_PREDICTION;
         break;
       case POS_VEL_PREDICTION:
@@ -124,10 +122,6 @@ void _100HzTask(){
         if (newGPSData == true) {
           newGPSData = false;
           CorrectXY();
-          /*Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
-            << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";*/
-          //Serial<<millis()<<","<<gpsX<<","<<gpsY<<","<<XEst<<","<<YEst<<"\r\n";
-          //Serial<<millis()<<","<<velN<<","<<velE<<","<<velX<<","<<velY<<"\r\n";
         }
         _100HzState = POLL_BARO;
         break;
@@ -136,11 +130,7 @@ void _100HzTask(){
         if (newBaro == true) {
           newBaro = false;
           CorrectZ();
-          //Serial<<millis()<<","<<pressure<<","<<baroZ<<","<<ZEst<<","<<baroVel<<","<<velZUp<<"\r\n";
-          //GetAltitude(&pressure, &initialPressure, &alti);
-          //Serial<< temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
         }
-
         _100HzState = LAST_100HZ_TASK;
         break;
       default:
