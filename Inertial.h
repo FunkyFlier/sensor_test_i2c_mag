@@ -6,6 +6,7 @@
 
 void GetInertial();
 void Predict(float);
+void InertialInit();
 //void CorrectGPS();
 //void CorrectAlt();
   

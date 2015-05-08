@@ -1,6 +1,7 @@
 #include "Inertial.h"
 #include "Calibration.h"
 #include "Attitude.h"
+#include <Streaming.h>
 
 float inertialX,inertialY,inertialZ;
 float velX,velY,velZ,velZUp;
@@ -15,6 +16,7 @@ float XEstHist[LAG_SIZE],YEstHist[LAG_SIZE],ZEstHist[LAG_SIZE_BARO];
 float XVelHist[LAG_SIZE],YVelHist[LAG_SIZE],ZVelHist[LAG_SIZE_BARO];
 
 
+
 void GetInertial(){
 
   inertialX = ((R11 * (filtAccX)) + (R21 * (filtAccY))) + (R31 * (filtAccZ));
@@ -24,7 +26,20 @@ void GetInertial(){
 
 }
 
+void InertialInit(){
+
+  memset(XEstHist,0,sizeof(XEstHist));
+  memset(YEstHist,0,sizeof(YEstHist));
+  memset(ZEstHist,0,sizeof(ZEstHist));
+
+  memset(XVelHist,0,sizeof(XVelHist));
+  memset(YVelHist,0,sizeof(YVelHist));
+  memset(ZVelHist,0,sizeof(ZVelHist));
+
+}
+
 void Predict(float dt){
+  
   float biasedX,biasedY,biasedZ;
   float accelBiasX,accelBiasY,accelBiasZ;
   float inertialXBiased,inertialYBiased,inertialZBiased;
@@ -145,5 +160,6 @@ void CorrectGPS(){
  }
  }
  */
+
 
 

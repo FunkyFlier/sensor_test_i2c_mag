@@ -35,6 +35,7 @@ void setup() {
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
   SetInitialQuaternion();
+  InertialInit();
   ControlLED(0x00);  
 
 
