@@ -2,12 +2,13 @@
 #include "Calibration.h"
 #include "Attitude.h"
 #include "GPS.h"
+#include "Sensors.h"
 #include <Streaming.h>
 
 float inertialX,inertialY,inertialZ;
 float velX,velY,velZ,velZUp;
 float XEst,YEst,ZEst,ZEstUp;
-float gpsX,gpsY,baroZ;
+float gpsX,gpsY,baroZ,baroVel;
 float gpsVelX,gpsVelY;
 float accelBiasX,accelBiasY,accelBiasZ;
 float distToCraft,headingToCraft;
@@ -102,7 +103,29 @@ void GetGPSXY(){
 }
 
 
-void CorrectGPS(){
+void GetBaroZ(){
+  static uint32_t baroTimer = 0;
+  static float prevBaro = 0;
+
+  float baroDT;
+  float baroAlt,baroRate;
+
+  baroDT = (millis() - baroTimer) * 0.001;
+  baroTimer = millis();
+
+  if (baroDT >= 0.1 || baroDT < 0) {
+    baroDT = 0.1;
+  }
+  GetAltitude(&pressure, &initialPressure, &baroAlt);
+  LPF(&baroZ,&baroAlt,&baroDT,RC_CONST_BARO);
+  baroRate = (baroZ - prevBaro) / baroDT;
+  LPF(&baroVel,&baroRate,&baroDT,RC_CONST_BARO);
+  prevBaro = baroZ;
+
+
+}
+
+void CorrectXY(){
   float xPosError,yPosError,xVelError,yVelError;
   float accelBiasXEF,accelBiasYEF,accelBiasZEF;
 
@@ -133,30 +156,34 @@ void CorrectGPS(){
   accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
 
 }
-/*
-void CorrectAlt(){
- zPosError = ZEstHist[lagIndex_z] + *ZPosBaro;
- zVelError = ZVelHist[lagIndex_z] + *ZVelBaro;
- 
- ZEst = ZEst - kPosBaro * zPosError;
- velZ = velZ - kVelBaro * zVelError;
- 
- accelBiasXEF = R11*accelBiasX + R21*accelBiasY + R31*accelBiasZ;
- accelBiasYEF = R12*accelBiasX + R22*accelBiasY + R32*accelBiasZ;
- accelBiasZEF = R13*accelBiasX + R23*accelBiasY + R33*accelBiasZ;
- 
- 
- accelBiasZEF = accelBiasZEF + kAccBaro * zVelError;
- 
- accelBiasX = R11*accelBiasXEF + R12*accelBiasYEF + R13*accelBiasZEF;
- accelBiasY = R21*accelBiasXEF + R22*accelBiasYEF + R23*accelBiasZEF;
- accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
- 
- ZEstUp = -1.0 * ZEst;
- velZUp = -1.0 * velZ;
- }
- 
- */
+
+void CorrectZ(){
+  GetBaroZ();
+  float zPosError,zVelError;
+  float accelBiasXEF,accelBiasYEF,accelBiasZEF;
+  
+  zPosError = ZEstHist[lagIndex_z] + baroZ;
+  zVelError = ZVelHist[lagIndex_z] + baroVel;
+
+  ZEst = ZEst - K_P_BARO * zPosError;
+  velZ = velZ - K_V_BARO * zVelError;
+
+  accelBiasXEF = R11*accelBiasX + R21*accelBiasY + R31*accelBiasZ;
+  accelBiasYEF = R12*accelBiasX + R22*accelBiasY + R32*accelBiasZ;
+  accelBiasZEF = R13*accelBiasX + R23*accelBiasY + R33*accelBiasZ;
+
+
+  accelBiasZEF = accelBiasZEF + K_B_BARO * zVelError;
+
+  accelBiasX = R11*accelBiasXEF + R12*accelBiasYEF + R13*accelBiasZEF;
+  accelBiasY = R21*accelBiasXEF + R22*accelBiasYEF + R23*accelBiasZEF;
+  accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
+
+  ZEstUp = -1.0 * ZEst;
+  velZUp = -1.0 * velZ;
+}
+
+
 void UpdateLagIndex(){
 
 
@@ -184,6 +211,9 @@ void UpdateLagIndex(){
     lagIndex_z = LAG_SIZE_BARO + lagIndex_z;
   }
 }
+
+
+
 
 
 

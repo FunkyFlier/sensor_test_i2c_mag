@@ -123,7 +123,7 @@ void _100HzTask(){
         GPSMonitor();
         if (newGPSData == true) {
           newGPSData = false;
-          CorrectGPS();
+          CorrectXY();
           /*Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
             << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";*/
           //Serial<<millis()<<","<<gpsX<<","<<gpsY<<","<<XEst<<","<<YEst<<"\r\n";
@@ -135,6 +135,8 @@ void _100HzTask(){
         PollPressure();
         if (newBaro == true) {
           newBaro = false;
+          CorrectZ();
+          //Serial<<millis()<<","<<pressure<<","<<baroZ<<","<<ZEst<<","<<baroVel<<","<<velZUp<<"\r\n";
           //GetAltitude(&pressure, &initialPressure, &alti);
           //Serial<< temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
         }
