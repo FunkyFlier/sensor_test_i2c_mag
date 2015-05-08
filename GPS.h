@@ -1,5 +1,5 @@
-#ifndef UBLOX_h
-#define UBLOX_h
+#ifndef GPS_h
+#define GPS_h
 #include <Arduino.h>
 
 #include "Math.h"
@@ -7,6 +7,8 @@
 #include "Types.h"
 
 #define RADIUS_EARTH 6372795
+#define SACC_MAX 5
+#define HACC_MAX 40
 
 typedef union{
   struct{
@@ -32,15 +34,16 @@ typedef union{
 }
 GPS_Union_t;
 
-extern boolean newGPSData;
+extern boolean newGPSData,GPSDetected;
 extern GPS_Union_t GPSData;
 extern float gpsAlt,floatLat, floatLon,velN, velE, velD;
-
+extern float homeLat,homeLon;
 
 
 void GPSInit();
 void DistBearing(int32_t*, int32_t*, int32_t*, int32_t*, float*, float*, float*, float*);
 void GPSMonitor();
+void GPSStart();
 
 #endif
 

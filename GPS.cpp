@@ -1,7 +1,9 @@
-#include "UBLOX.h"
+#include "GPS.h"
+#include "LED.h"
 #include <Streaming.h>
 
-boolean newGPSData;
+boolean newGPSData,GPSDetected;
+float homeLat,homeLon;
 
 boolean LLHFlag,VELFlag;
 uint8_t GPSState;
@@ -36,6 +38,75 @@ void DistBearing(int32_t *lat1, int32_t *lon1, int32_t *lat2, int32_t *lon2,floa
   *bearing = FastAtan2(*distY,*distX);
 }
 
+void GPSStart() {
+  uint32_t generalPurposeTimer;
+  uint8_t LEDPattern[4] = {
+    0x00,0x00,0x00,0x00      };
+  uint8_t LEDIndex = 0;
+  
+  GPSInit();
+  
+  generalPurposeTimer = millis();
+  
+  while ((millis() - generalPurposeTimer < 1000) && (newGPSData== false)) {
+    GPSMonitor();
+    if (newGPSData == true) {
+      GPSDetected = true;
+    }
+  }
+  //to do add feed back with leds
+  if (GPSDetected == true) {
+    //gpsFailSafe = false;
+   memcpy(LEDPattern, (uint8_t[]){0x00, 0x0F, 0x00,0x0F}, 4);
+   
+    while (GPSData.vars.gpsFix != 0x3) {
+
+      GPSMonitor();
+      if (millis() - generalPurposeTimer > 500) {
+        generalPurposeTimer = millis();
+        ControlLED(LEDPattern[LEDIndex++]);
+        if (LEDIndex >=4){
+          LEDIndex = 0;
+        }
+      }
+
+    }
+    LEDIndex = 0;
+    memcpy(LEDPattern, (uint8_t[]){0x01, 0x02, 0x04,0x08}, 4);
+    while (GPSData.vars.hAcc * 0.001 > (HACC_MAX - 0.5) ) {
+      GPSMonitor();
+      if (millis() - generalPurposeTimer > 500) {
+        generalPurposeTimer = millis();
+        ControlLED(LEDPattern[LEDIndex++]);
+        if (LEDIndex >=4){
+          LEDIndex = 0;
+        }
+      }
+    }
+    LEDIndex = 0;
+    memcpy(LEDPattern, (uint8_t[]){0x08, 0x04, 0x02,0x01}, 4);
+    while (GPSData.vars.sAcc * 0.001 > (SACC_MAX - 0.25) ) {
+      GPSMonitor();
+      if (millis() - generalPurposeTimer > 500) {
+        generalPurposeTimer = millis();
+        ControlLED(LEDPattern[LEDIndex++]);
+        if (LEDIndex >=4){
+          LEDIndex = 0;
+        }
+      }
+    }
+
+    newGPSData = false;
+    while (newGPSData == false) {
+      GPSMonitor();
+    }
+    homeLat = (GPSData.vars.lat) * 0.0000001;
+    homeLon = (GPSData.vars.lon) * 0.0000001;
+  }
+
+
+
+}
 
 
 void GPSMonitor(){
@@ -156,6 +227,10 @@ void GPSMonitor(){
     velD = GPSData.vars.velD * 0.01;
   }
 }
+
+
+
+
 
 
 

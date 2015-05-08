@@ -2,7 +2,7 @@
 #include <I2C.h>
 #include <EEPROM.h>
 #include <Streaming.h>
-#include "UBLOX.h"
+#include "GPS.h"
 #include "Types.h"
 #include "Definitions.h"
 #include "Enums.h"
@@ -11,6 +11,7 @@
 #include "Calibration.h"
 #include "Attitude.h"
 #include "Inertial.h"
+#include "LED.h"
 
 uint32_t printTimer;
 uint32_t loopTime;
@@ -19,13 +20,14 @@ void setup() {
   Serial.begin(115200);
 
   SetPinModes();
-
+  ControlLED(0x0F);  
   CheckDefines();
 
   SPIInit(MSBFIRST,SPI_CLOCK_DIV2,SPI_MODE0);
   I2CInit();
-
-  GPSInit();
+  
+  //GPSInit();
+  GPSStart();
   BaroInit();
   GyroInit();
   AccInit();
@@ -97,11 +99,17 @@ void _100HzTask(){
         break;
       case GET_EULER:
         GetEuler();
+        //Serial<<pitchInDegrees<<","<<rollInDegrees<<","<<yawInDegrees<<"\r\n";
         _100HzState = GET_INERTIAL;
         break;
       case GET_INERTIAL:
         GetInertial();
-        _100HzState = POLL_GPS;
+        //Serial<<inertialX<<","<<inertialY<<","<<inertialZ<<"\r\n";
+        _100HzState = POS_VEL_PREDICTION;
+        break;
+      case POS_VEL_PREDICTION:
+      //Predict();
+      _100HzState = POLL_GPS;
         break;
       case POLL_GPS:
         GPSMonitor();
@@ -191,7 +199,6 @@ void SetPinModes(){
   FlashSSHigh();
 
   D22Output();
-  //pinMode(22,INPUT);
   D23Output();
   D24Output();
   D25Output();
@@ -200,15 +207,10 @@ void SetPinModes(){
   D28Output();
   D29Output();
 
-  pinMode(RED, OUTPUT);
-  digitalWrite(RED, LOW);
-  pinMode(GREEN, OUTPUT);
-  digitalWrite(GREEN, LOW);
-  pinMode(YELLOW, OUTPUT);
-  digitalWrite(YELLOW, LOW);
-  pinMode(BLUE, OUTPUT);
-  digitalWrite(BLUE, LOW);
+  LEDInit();
+  
 }
+
 
 
 
