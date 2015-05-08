@@ -1,13 +1,16 @@
 #include "Inertial.h"
 #include "Calibration.h"
 #include "Attitude.h"
+#include "GPS.h"
 #include <Streaming.h>
 
 float inertialX,inertialY,inertialZ;
 float velX,velY,velZ,velZUp;
 float XEst,YEst,ZEst,ZEstUp;
-
-
+float gpsX,gpsY,baroZ;
+float gpsVelX,gpsVelY;
+float accelBiasX,accelBiasY,accelBiasZ;
+float distToCraft,headingToCraft;
 
 //-------------------
 float inertialZGrav;
@@ -36,10 +39,19 @@ void InertialInit(){
   memset(YVelHist,0,sizeof(YVelHist));
   memset(ZVelHist,0,sizeof(ZVelHist));
 
+  velX = 0;
+  velY = 0;
+  velZ = 0;
+
+
+  XEst = 0;
+  YEst = 0;
+  ZEst = 0;
+
 }
 
 void Predict(float dt){
-  
+
   float biasedX,biasedY,biasedZ;
   float accelBiasX,accelBiasY,accelBiasZ;
   float inertialXBiased,inertialYBiased,inertialZBiased;
@@ -81,35 +93,48 @@ void Predict(float dt){
 
 }
 
-/*
+void GetGPSXY(){
+  DistBearing(&homeLat, &homeLon, &GPSData.vars.lat, &GPSData.vars.lon, &gpsX, &gpsY, &distToCraft, &headingToCraft);
+
+  gpsVelX = velN;
+  gpsVelY = velE;
+
+}
+
+
 void CorrectGPS(){
- xPosError = XEstHist[lagIndex] - *XPosGPS;
- yPosError = YEstHist[lagIndex] - *YPosGPS;
- 
- xVelError = XVelHist[lagIndex] - *XVelGPS;
- yVelError = YVelHist[lagIndex] - *YVelGPS;
- 
- XEst = XEst - kPosGPS * xPosError;
- YEst = YEst - kPosGPS * yPosError;
- 
- velX = velX - kVelGPS * xVelError;
- velY = velY - kVelGPS * yVelError;
- 
- accelBiasXEF = R11 * accelBiasX + R21 * accelBiasY + R31 * accelBiasZ;
- accelBiasYEF = R12 * accelBiasX + R22 * accelBiasY + R32 * accelBiasZ;
- accelBiasZEF = R13 * accelBiasX + R23 * accelBiasY + R33 * accelBiasZ;
- 
- 
- accelBiasXEF = accelBiasXEF + kAccGPS * xVelError;
- accelBiasYEF = accelBiasYEF + kAccGPS * yVelError;
- 
- accelBiasX = R11*accelBiasXEF + R12*accelBiasYEF + R13*accelBiasZEF;
- accelBiasY = R21*accelBiasXEF + R22*accelBiasYEF + R23*accelBiasZEF;
- accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
- 
- }
- 
- void CorrectAlt(){
+  float xPosError,yPosError,xVelError,yVelError;
+  float accelBiasXEF,accelBiasYEF,accelBiasZEF;
+
+  GetGPSXY();
+
+  xPosError = XEstHist[lagIndex] - gpsX;
+  yPosError = YEstHist[lagIndex] - gpsY;
+
+  xVelError = XVelHist[lagIndex] - gpsVelX;
+  yVelError = YVelHist[lagIndex] - gpsVelY;
+
+  XEst = XEst - K_P_GPS * xPosError;
+  YEst = YEst - K_P_GPS * yPosError;
+
+  velX = velX - K_V_GPS * xVelError;
+  velY = velY - K_V_GPS * yVelError;
+
+  accelBiasXEF = R11 * accelBiasX + R21 * accelBiasY + R31 * accelBiasZ;
+  accelBiasYEF = R12 * accelBiasX + R22 * accelBiasY + R32 * accelBiasZ;
+  accelBiasZEF = R13 * accelBiasX + R23 * accelBiasY + R33 * accelBiasZ;
+
+
+  accelBiasXEF = accelBiasXEF + K_B_GPS * xVelError;
+  accelBiasYEF = accelBiasYEF + K_B_GPS * yVelError;
+
+  accelBiasX = R11*accelBiasXEF + R12*accelBiasYEF + R13*accelBiasZEF;
+  accelBiasY = R21*accelBiasXEF + R22*accelBiasYEF + R23*accelBiasZEF;
+  accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
+
+}
+/*
+void CorrectAlt(){
  zPosError = ZEstHist[lagIndex_z] + *ZPosBaro;
  zVelError = ZVelHist[lagIndex_z] + *ZVelBaro;
  
@@ -131,35 +156,38 @@ void CorrectGPS(){
  velZUp = -1.0 * velZ;
  }
  
- 
- void UpdateLagIndex(){
- 
- 
- currentEstIndex++;
- if (currentEstIndex >= (LAG_SIZE) || currentEstIndex < 0){
- currentEstIndex = 0;
- }
- 
- lagIndex = currentEstIndex - 55;
- 
- 
- if (lagIndex < 0){
- lagIndex = LAG_SIZE + lagIndex;
- }
- 
- 
- //0.3sec lag
- currentEstIndex_z++;
- if (currentEstIndex_z >= (LAG_SIZE_BARO) || currentEstIndex_z < 0){
- currentEstIndex_z = 0;
- }
- lagIndex_z = currentEstIndex_z - 26;
- 
- if (lagIndex_z < 0){
- lagIndex_z = LAG_SIZE_BARO + lagIndex_z;
- }
- }
  */
+void UpdateLagIndex(){
+
+
+  currentEstIndex++;
+  if (currentEstIndex >= (LAG_SIZE) || currentEstIndex < 0){
+    currentEstIndex = 0;
+  }
+
+  lagIndex = currentEstIndex - (LAG_SIZE - 1);
+
+
+  if (lagIndex < 0){
+    lagIndex = LAG_SIZE + lagIndex;
+  }
+
+
+  //0.3sec lag
+  currentEstIndex_z++;
+  if (currentEstIndex_z >= (LAG_SIZE_BARO) || currentEstIndex_z < 0){
+    currentEstIndex_z = 0;
+  }
+  lagIndex_z = currentEstIndex_z - (LAG_SIZE_BARO- 1);
+
+  if (lagIndex_z < 0){
+    lagIndex_z = LAG_SIZE_BARO + lagIndex_z;
+  }
+}
+
+
+
+
 
 
 

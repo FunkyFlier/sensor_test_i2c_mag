@@ -51,7 +51,7 @@ void loop() {
   _100HzTask();
   if (millis() - printTimer > 100) {
     printTimer = millis();
-    Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
+    //Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   }
 
 }
@@ -116,15 +116,18 @@ void _100HzTask(){
         _100HzState = POLL_GPS;
         break;
       case UPDATE_LAG_INDEX:
-        //UpdateLagIndex();
+        UpdateLagIndex();
         _100HzState = POLL_GPS;
         break;
       case POLL_GPS:
         GPSMonitor();
         if (newGPSData == true) {
           newGPSData = false;
+          CorrectGPS();
           /*Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
             << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";*/
+          //Serial<<millis()<<","<<gpsX<<","<<gpsY<<","<<XEst<<","<<YEst<<"\r\n";
+          //Serial<<millis()<<","<<velN<<","<<velE<<","<<velX<<","<<velY<<"\r\n";
         }
         _100HzState = POLL_BARO;
         break;
