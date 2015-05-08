@@ -18,7 +18,7 @@ float yawInRadians,pitchInRadians,rollInRadians;
 float R11,R12,R13,R21,R22,R23,R31,R32,R33;
 float declination;
 
-float q0,q1,q2,q3;
+float q0=1,q1=0,q2=0,q3=0;
 float q0q0,q1q1,q2q2,q3q3,q0q1,q0q2,q0q3,q1q2,q1q3,q2q3;
 float acc_x,acc_y,acc_z,mag_x,mag_y,mag_z,gro_x,gro_y,gro_z;
 float cosDec,sinDec;
@@ -58,7 +58,7 @@ void AHRSupdate(float dt) {
   float qa,qb,qc;
 
   float kiDTAcc,kiDTMag,dtby2;
-  float bx,by,bz,wx,wy,wz,vx,vy,vz;
+  float bx,bz,wx,wy,wz,vx,vy,vz;
 
   float hx,hy,hz,exm,eym,ezm,exa,eya,eza;
 

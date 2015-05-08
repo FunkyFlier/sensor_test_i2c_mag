@@ -25,7 +25,7 @@ void setup() {
 
   SPIInit(MSBFIRST,SPI_CLOCK_DIV2,SPI_MODE0);
   I2CInit();
-  
+
   //GPSInit();
   GPSStart();
   BaroInit();
@@ -35,6 +35,9 @@ void setup() {
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
   SetInitialQuaternion();
+  ControlLED(0x00);  
+
+
   Serial<<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
 
 }
@@ -108,15 +111,19 @@ void _100HzTask(){
         _100HzState = POS_VEL_PREDICTION;
         break;
       case POS_VEL_PREDICTION:
-      //Predict();
-      _100HzState = POLL_GPS;
+        Predict(_100HzDt);
+        _100HzState = POLL_GPS;
+        break;
+      case UPDATE_LAG_INDEX:
+        //UpdateLagIndex();
+        _100HzState = POLL_GPS;
         break;
       case POLL_GPS:
         GPSMonitor();
         if (newGPSData == true) {
           newGPSData = false;
-          Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
-            << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";
+          /*Serial <<millis()<<","<< _FLOAT(floatLat,7) << "," << _FLOAT(floatLon,7) << "," << gpsAlt << "," << velN << "," << velE << "," << velD << ","
+            << GPSData.vars.gpsFix  << "," << GPSData.vars.hAcc << "," << GPSData.vars.sAcc << "\r\n";*/
         }
         _100HzState = POLL_BARO;
         break;
@@ -124,8 +131,8 @@ void _100HzTask(){
         PollPressure();
         if (newBaro == true) {
           newBaro = false;
-          GetAltitude(&pressure, &initialPressure, &alti);
-          Serial<< temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
+          //GetAltitude(&pressure, &initialPressure, &alti);
+          //Serial<< temperature << "," << pressure << "," << alti << "," << initialPressure << "\r\n";
         }
 
         _100HzState = LAST_100HZ_TASK;
@@ -208,8 +215,10 @@ void SetPinModes(){
   D29Output();
 
   LEDInit();
-  
+
 }
+
+
 
 
 

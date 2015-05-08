@@ -37,7 +37,7 @@ GPS_Union_t;
 extern boolean newGPSData,GPSDetected;
 extern GPS_Union_t GPSData;
 extern float gpsAlt,floatLat, floatLon,velN, velE, velD;
-extern float homeLat,homeLon;
+extern int32_t homeLat,homeLon;
 
 
 void GPSInit();

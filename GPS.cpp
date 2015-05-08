@@ -3,7 +3,7 @@
 #include <Streaming.h>
 
 boolean newGPSData,GPSDetected;
-float homeLat,homeLon;
+int32_t homeLat,homeLon;
 
 boolean LLHFlag,VELFlag;
 uint8_t GPSState;
@@ -100,8 +100,9 @@ void GPSStart() {
     while (newGPSData == false) {
       GPSMonitor();
     }
-    homeLat = (GPSData.vars.lat) * 0.0000001;
-    homeLon = (GPSData.vars.lon) * 0.0000001;
+    homeLat = GPSData.vars.lat;
+    homeLon = GPSData.vars.lon;
+
   }
 
 
