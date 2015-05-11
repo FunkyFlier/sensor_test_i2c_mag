@@ -165,8 +165,6 @@ void _100HzTask(){
         if (newRC == true) {//9
           newRC = false;
           ProcessChannels();
-          //Serial<<rcData[0].rcvd<<","<<rcData[1].rcvd<<","<<rcData[2].rcvd<<","<<rcData[3].rcvd<<","<<rcData[4].rcvd<<","<<rcData[5].rcvd<<","<<rcData[6].rcvd<<","<<rcData[7].rcvd<<"\r\n";
-          Serial<<RCValue[THRO]<<","<<RCValue[AILE]<<","<<RCValue[ELEV]<<","<<RCValue[RUDD]<<","<<RCValue[GEAR]<<","<<RCValue[AUX1]<<","<<RCValue[AUX2]<<","<<RCValue[AUX3]<<","<<RCFailSafe<<"\r\n";
           RCFailSafeCounter = 0;
         }
         if (RCFailSafeCounter > 200){
