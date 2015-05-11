@@ -13,7 +13,7 @@ float deltaLat;
 GPS_Union_t GPSData;
 
 uint16_t msgLength;
-uint8_t index,msgLengthLSB,msgLengthMSB,msgType,inBuffer[50],localSumA,localSumB,inByte;
+uint8_t index,msgLengthLSB,msgLengthMSB,msgType,inBuffer[50],localSumA,localSumB;//, uint8_tinByte;
 
 float gpsAlt;
 
@@ -111,6 +111,7 @@ void GPSStart() {
 
 
 void GPSMonitor(){
+  uint8_t inByte;
   while (gpsPort.available() > 0){
     switch (GPSState){
     case 0:

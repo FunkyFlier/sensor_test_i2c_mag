@@ -12,9 +12,11 @@
 #include "Attitude.h"
 #include "Inertial.h"
 #include "LED.h"
+#include "RCSignals.h"
 
 uint32_t printTimer;
 uint32_t loopTime;
+volatile uint32_t RCFailSafeCounter;
 
 void setup() {
   Serial.begin(115200);
@@ -22,6 +24,9 @@ void setup() {
   SetPinModes();
   ControlLED(0x0F);  
   CheckDefines();
+
+  DetectRC();
+  _200HzISRConfig();
 
   SPIInit(MSBFIRST,SPI_CLOCK_DIV2,SPI_MODE0);
   I2CInit();
@@ -32,10 +37,14 @@ void setup() {
   GyroInit();
   AccInit();
   MagInit();
+
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
+  LoadRCValuesFromRom();
+
   SetInitialQuaternion();
   InertialInit();
+
   ControlLED(0x00);  
 
 
@@ -55,6 +64,25 @@ void loop() {
   }
 
 }
+//to do move these functions
+void _200HzISRConfig(){
+  TCCR5A = (1<<COM5A1);
+  TCCR5B = (1<<CS51)|(1<<WGM52);
+  TIMSK5 = (1<<OCIE5A);
+  OCR5A = 10000;
+}
+
+ISR(TIMER5_COMPA_vect, ISR_NOBLOCK){
+  RCFailSafeCounter++;
+  if (rcType != RC){
+    FeedLine();
+  }
+}
+
+
+
+//end move these functions
+
 
 void _400HzTask() {
   uint32_t _400HzTime;
@@ -130,6 +158,19 @@ void _100HzTask(){
         if (newBaro == true) {
           newBaro = false;
           CorrectZ();
+        }
+        _100HzState = PROCESS_CONTROL_SIGNALS;
+        break;
+      case PROCESS_CONTROL_SIGNALS:
+        if (newRC == true) {//9
+          newRC = false;
+          ProcessChannels();
+          //Serial<<rcData[0].rcvd<<","<<rcData[1].rcvd<<","<<rcData[2].rcvd<<","<<rcData[3].rcvd<<","<<rcData[4].rcvd<<","<<rcData[5].rcvd<<","<<rcData[6].rcvd<<","<<rcData[7].rcvd<<"\r\n";
+          Serial<<RCValue[THRO]<<","<<RCValue[AILE]<<","<<RCValue[ELEV]<<","<<RCValue[RUDD]<<","<<RCValue[GEAR]<<","<<RCValue[AUX1]<<","<<RCValue[AUX2]<<","<<RCValue[AUX3]<<","<<RCFailSafe<<"\r\n";
+          RCFailSafeCounter = 0;
+        }
+        if (RCFailSafeCounter > 200){
+          RCFailSafe = true;
         }
         _100HzState = LAST_100HZ_TASK;
         break;
@@ -213,6 +254,9 @@ void SetPinModes(){
   LEDInit();
 
 }
+
+
+
 
 
 

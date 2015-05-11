@@ -2,6 +2,27 @@
 #include <I2c.h>
 #include <EEPROM.h>
 #include <Arduino.h>
+#include "Definitions.h"
+
+void RCSerialBegin(uint32_t baudRate, uint8_t config){
+  RC_SERIAL_PORT.begin(baudRate,config);
+}
+
+void RCSerialBegin(uint32_t baudRate){
+  RC_SERIAL_PORT.begin(baudRate);
+}
+
+void RCSerialWrte(uint8_t outByte){
+  RC_SERIAL_PORT.write(outByte);
+}
+
+uint8_t RCSerialRead(){
+  return RC_SERIAL_PORT.read();
+}
+
+uint8_t RCSerialAvailable(){
+  return RC_SERIAL_PORT.available();
+}
 
 void SPIInit(uint8_t endian,uint8_t clockDiv,uint8_t mode){
   SPI.begin();
@@ -38,10 +59,10 @@ uint8_t I2CReceive(){
 }
 
 
-void EEPROMWrite(uint8_t address,uint8_t data){
+void EEPROMWrite(uint16_t address,uint16_t data){
   EEPROM.write(address,data);
 }
 
-uint8_t EEPROMRead(uint8_t address){
+uint8_t EEPROMRead(uint16_t address){
   return EEPROM.read(address);
 }
