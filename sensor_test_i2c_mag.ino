@@ -157,6 +157,7 @@ void _100HzTask(){
         PollPressure();
         if (newBaro == true) {
           newBaro = false;
+          Serial<<pressure<<"\r\n";
           CorrectZ();
         }
         _100HzState = PROCESS_CONTROL_SIGNALS;

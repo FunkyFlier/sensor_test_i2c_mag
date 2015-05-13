@@ -133,7 +133,7 @@ uint32_u D_rcvd;
 float D1, D2;
 float pres, temperature, dT, TEMP, OFF, SENS, P;
 uint8_t baroState;
-uint32_t baroRateTimer, baroDelayTimer;
+uint32_t baroPollTimer, baroDelayTimer;
 
 
 #endif//#ifdef V2
@@ -143,7 +143,7 @@ uint32_t baroRateTimer, baroDelayTimer;
 
 #ifdef V2
 void PollPressure() {
-  if (millis() - baroRateTimer >= BARO_CONV_TIME) {
+  if (millis() - baroPollTimer >= BARO_CONV_TIME) {
     switch (baroState) {
     case 0://start temp conv
       BaroSSLow();
@@ -181,7 +181,7 @@ void PollPressure() {
         D1 = (float)D_rcvd.val;
         BaroSSHigh();
         baroState = 0;
-        baroRateTimer = millis();
+        baroPollTimer = millis();
         GetBaro();
         newBaro = true;
       }
@@ -277,7 +277,7 @@ void BaroInit() {
   CheckCRC();
 
 
-  baroRateTimer = millis();
+  baroPollTimer = millis();
   while (newBaro == false) {
     PollPressure();
   }
