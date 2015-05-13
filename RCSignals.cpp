@@ -322,6 +322,7 @@ void DSMDetectRes(){
 
 
 boolean DSMParser(){
+  uint8_t inByte;
   boolean validFrame = false;
   while (RCSerialAvailable() >16){
     RCSerialRead();
