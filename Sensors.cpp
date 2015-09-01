@@ -1,7 +1,46 @@
 #include "Sensors.h"
+#include "Attitude.h"
 
+boolean newLidar;
+float lidarAlt,lidarVel;
+int16_u lidarDist;
+void LidarInit(){
+  I2CWrite(LIDAR_ADDR,0x1C,0x20);//low noise low sensitivity
+  delay(1);
+  I2CWrite(LIDAR_ADDR,0x45,0x13);//continous mode 100Hz
+  delay(1);
+  I2CWrite(LIDAR_ADDR,0x04,0x21);//mode pin low on reading
+  delay(1);
+  I2CWrite(LIDAR_ADDR,0x11,0xFF);//unlimited readings
+  delay(1);
+  I2CWrite(LIDAR_ADDR,0x00,0x04);//start readings 
+  delay(1);
+}
+void PollLidar(){
+  static uint32_t lidarTimer;
+  static float prevLidarAlt;
+  float lidarDT;
+  
+  if (millis() - lidarTimer >= 50){
+    lidarDT = (millis() - lidarTimer) * 0.001;
+    if (lidarDT > 0.1 || lidarDT < 0){
+      lidarDT = 0.1;
+    }
+    lidarTimer = millis();
+    newLidar = true;
+    GetLidar();
+    
+    lidarAlt = cos(pitchInRadians) * cos(rollInRadians) * lidarDist.val * 0.01;
+    lidarVel = (lidarAlt - prevLidarAlt) / lidarDT;
+    prevLidarAlt = lidarAlt;
+  }
+}
+void GetLidar(){
+  I2c.readStopStart(LIDAR_ADDR,0x8f,2);
+  lidarDist.buffer[1] = I2CReceive();
+  lidarDist.buffer[0] = I2CReceive();
 
-
+}
 
 
 #ifdef ROT_45

@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <I2C.h>
+#include "I2C_.h"
 #include <EEPROM.h>
 #include <Streaming.h>
 #include "GPS.h"
@@ -18,6 +18,7 @@ uint32_t printTimer;
 uint32_t loopTime;
 volatile uint32_t RCFailSafeCounter;
 
+
 void setup() {
   Serial.begin(115200);
 
@@ -32,11 +33,12 @@ void setup() {
   I2CInit();
 
   //GPSInit();
-  GPSStart();
+  //GPSStart();
   BaroInit();
   GyroInit();
   AccInit();
   MagInit();
+  LidarInit();
 
   LoadCalibValuesFromRom();
   LoadAttValuesFromRom();
@@ -60,6 +62,8 @@ void loop() {
   _100HzTask();
   if (millis() - printTimer > 100) {
     printTimer = millis();
+    //Serial<<magX.val<<","<<magY.val<<","<<magZ.val<<","<<accX.val<<","<<accY.val<<","<<accZ.val<<","<<gyroX.val<<","<<gyroY.val<<","<<gyroZ.val<<"\r\n";
+    //Serial<<initialPressure<<","<<pressure<<","<<alti<<"\r\n";
     //Serial <<yawInDegrees<<","<<rollInDegrees<<","<<pitchInDegrees<<"\r\n";
   }
 
@@ -157,8 +161,17 @@ void _100HzTask(){
         PollPressure();
         if (newBaro == true) {
           newBaro = false;
-          Serial<<pressure<<"\r\n";
-          CorrectZ();
+          //Serial<<pressure<<"\r\n";
+          //CorrectZ();
+        }
+        _100HzState = POLL_LIDAR;
+        break;
+        case POLL_LIDAR:
+        PollLidar();
+        if (newLidar == true) {
+          newLidar = false;
+          //Serial<<pressure<<"\r\n";
+          CorrectZLidar();
         }
         _100HzState = PROCESS_CONTROL_SIGNALS;
         break;

@@ -7,8 +7,8 @@
 #include "Types.h"
 
 #define RADIUS_EARTH 6372795
-#define SACC_MAX 5
-#define HACC_MAX 40
+#define SACC_MAX 50
+#define HACC_MAX 400
 
 typedef union{
   struct{

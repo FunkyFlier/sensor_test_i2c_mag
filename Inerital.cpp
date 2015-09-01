@@ -183,6 +183,32 @@ void CorrectZ(){
   velZUp = -1.0 * velZ;
 }
 
+void CorrectZLidar(){
+  float zPosError,zVelError;
+  float accelBiasXEF,accelBiasYEF,accelBiasZEF;
+  
+  zPosError = ZEstHist[currentEstIndex_z] + lidarAlt;
+  zVelError = ZVelHist[currentEstIndex_z] + lidarVel;
+
+  ZEst = ZEst - K_P_BARO * zPosError;
+  velZ = velZ - K_V_BARO * zVelError;
+
+  accelBiasXEF = R11*accelBiasX + R21*accelBiasY + R31*accelBiasZ;
+  accelBiasYEF = R12*accelBiasX + R22*accelBiasY + R32*accelBiasZ;
+  accelBiasZEF = R13*accelBiasX + R23*accelBiasY + R33*accelBiasZ;
+
+
+  accelBiasZEF = accelBiasZEF + K_B_BARO * zVelError;
+
+  accelBiasX = R11*accelBiasXEF + R12*accelBiasYEF + R13*accelBiasZEF;
+  accelBiasY = R21*accelBiasXEF + R22*accelBiasYEF + R23*accelBiasZEF;
+  accelBiasZ = R31*accelBiasXEF + R32*accelBiasYEF + R33*accelBiasZEF;
+
+  ZEstUp = -1.0 * ZEst;
+  velZUp = -1.0 * velZ;
+}
+
+
 
 void UpdateLagIndex(){
 

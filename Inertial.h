@@ -21,6 +21,7 @@ void CorrectXY();
 void UpdateLagIndex();
 void GetBaroZ();
 void CorrectZ();
+void CorrectZLidar();
   
 extern float inertialX,inertialY,inertialZ;
 extern float velX,velY,velZ,velZUp,XEst,YEst,ZEst,ZEstUp;

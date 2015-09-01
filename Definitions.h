@@ -152,6 +152,7 @@
 #define Port2 Serial2
 #define gpsPort Serial3
 
+#define LIDAR_ADDR 0x62
 
 //end common defines
 

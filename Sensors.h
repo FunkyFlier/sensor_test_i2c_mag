@@ -6,13 +6,13 @@
 #include <Streaming.h>
 #include "Comm.h"
 #include <SPI.h>
-#include <I2c.h>
+#include "I2C_.h"
 
 extern int16_u gyroX, gyroY, gyroZ;
 extern int16_u  accX, accY, accZ;
 extern int16_u magX,magY,magZ;
-extern float initialPressure, pressure, alti;
-extern boolean newBaro,magDetected;
+extern float initialPressure, pressure, alti,lidarAlt,lidarVel;
+extern boolean newBaro,magDetected,newLidar;
 
 #ifdef V1
 extern short temperature;
@@ -33,6 +33,10 @@ void MagInit();
 void BaroInit();
 void PollPressure();
 boolean GetAltitude(float*, float*, float*);
+
+void LidarInit();
+void PollLidar();
+void GetLidar();
 
 
 #endif

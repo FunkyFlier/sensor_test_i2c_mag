@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <I2c.h>
+#include "I2C_.h"
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "Definitions.h"
@@ -44,6 +44,10 @@ void I2CInit(){
   I2c.begin();
   I2c.setSpeed(1);
   I2c.timeOut(2);
+}
+
+uint8_t I2CReadStopStart(uint8_t deviceAddress, uint8_t registerAddress, uint8_t numBytes){
+  return I2c.readStopStart(deviceAddress, registerAddress, numBytes);
 }
 
 uint8_t I2CRead(uint8_t deviceAddress, uint8_t registerAddress, uint8_t numBytes){
